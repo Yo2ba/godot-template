@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://c6x6h5mvi2y1s"]
+
+[ext_resource type="Script" uid="uid://dtmh2v5p56b4i" path="res://examples/scene_loading/example.gd" id="1_ax6hn"]
+
+[node name="ExampleScene" type="Node2D" unique_id=885260336]
+script = ExtResource("1_ax6hn")
+
+[node name="Button2" type="Button" parent="." unique_id=1806888753]
+offset_left = 518.0
+offset_top = 291.0
+offset_right = 638.0
+offset_bottom = 322.0
+text = "threaded_load"

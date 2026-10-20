@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://c0ifgk250cke1"]
+
+[ext_resource type="Script" uid="uid://dhnfkxlrrvo3f" path="res://scripts/utils/prompt/prompt.gd" id="1_smfc7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iwpui"]
+bg_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="Prompt" type="CanvasLayer" unique_id=186042389]
+script = ExtResource("1_smfc7")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=788672140]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.24705882)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=463062791]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=890288907]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_iwpui")
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=140619214]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1939247902]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1143763434]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "title"
+horizontal_alignment = 1
+
+[node name="Message" type="RichTextLabel" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1037382830]
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 2
+text = "message"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=231286833]
+layout_mode = 2
+
+[node name="ConfirmBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=11195421]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "confirm_btn"
+
+[node name="CancelBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1845960312]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "cancel_btn"
+
+[node name="NE" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=2096906608]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="CloseBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/NE" unique_id=1911604448]
+layout_mode = 2
+text = "x"
