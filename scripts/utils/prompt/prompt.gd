@@ -6,7 +6,7 @@ extends CanvasLayer
 @onready var message: RichTextLabel = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Message
 @onready var confirm_btn: Button = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ConfirmBtn
 @onready var cancel_btn: Button = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CancelBtn
-@onready var close_btn: Button = $CenterContainer/PanelContainer/MarginContainer/NE/CloseBtn
+@onready var close_btn: TextureButton = $CenterContainer/PanelContainer/MarginContainer/NE/CloseBtn
 
 var callable: Callable
 var is_paused: bool

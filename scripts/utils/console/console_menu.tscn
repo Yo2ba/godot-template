@@ -1,0 +1,135 @@
+[gd_scene format=3 uid="uid://nugh2wokqnq3"]
+
+[ext_resource type="Script" uid="uid://clww6upaan6y3" path="res://scripts/utils/console/console_menu.gd" id="1_5wnhe"]
+[ext_resource type="Theme" uid="uid://bln5anbi0dt0n" path="res://utils/api_theme.tres" id="1_ev3qo"]
+[ext_resource type="Texture2D" uid="uid://cx0gdlg2ddry3" path="res://scripts/utils/console/cross.svg" id="2_2of2h"]
+[ext_resource type="FontFile" uid="uid://4wkebsccq512" path="res://scripts/utils/console/Stratum2-Bold-700.ttf" id="2_egmcf"]
+[ext_resource type="FontFile" uid="uid://ood63wr07bui" path="res://scripts/utils/console/Stratum2-Mono-Regular-400.ttf" id="2_tok2f"]
+[ext_resource type="Texture2D" uid="uid://bhnrl0cqanl5s" path="res://scripts/utils/console/arrow.svg" id="6_d5qkd"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ohn4w"]
+bg_color = Color(0.13333334, 0.15686275, 0.19215687, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.22352941, 0.24313726, 0.27450982, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d5qkd"]
+bg_color = Color(0.22352941, 0.24313726, 0.27450982, 0.24705882)
+border_width_bottom = 1
+border_color = Color(0.22352941, 0.24313726, 0.27450982, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ev3qo"]
+content_margin_left = 4.0
+bg_color = Color(0, 0, 0, 0.24705882)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_egmcf"]
+
+[node name="ConsoleMenu" type="Control" unique_id=407086451 node_paths=PackedStringArray("window", "output", "line", "close_btn", "title_grabber")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_ev3qo")
+script = ExtResource("1_5wnhe")
+window = NodePath("Control/Window")
+output = NodePath("Control/Window/VBoxContainer/BodySections/VBoxContainer/MarginContainer/Output")
+line = NodePath("Control/Window/VBoxContainer/BodySections/VBoxContainer/Line")
+close_btn = NodePath("Control/Window/VBoxContainer/TitleSection/MarginContainer/TitleBar/CloseBtn")
+title_grabber = NodePath("Control/Window/VBoxContainer/TitleSection")
+
+[node name="Control" type="Control" parent="." unique_id=1533860126]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 1
+
+[node name="Window" type="PanelContainer" parent="Control" unique_id=158625879]
+layout_mode = 0
+offset_right = 800.0
+offset_bottom = 600.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ohn4w")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/Window" unique_id=2147462215]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TitleSection" type="PanelContainer" parent="Control/Window/VBoxContainer" unique_id=1516393]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_d5qkd")
+
+[node name="MarginContainer" type="MarginContainer" parent="Control/Window/VBoxContainer/TitleSection" unique_id=773721754]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="TitleBar" type="HBoxContainer" parent="Control/Window/VBoxContainer/TitleSection/MarginContainer" unique_id=191726735]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Control/Window/VBoxContainer/TitleSection/MarginContainer/TitleBar" unique_id=299643952]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_egmcf")
+theme_override_font_sizes/font_size = 16
+text = "CONSOLE"
+
+[node name="Control" type="Control" parent="Control/Window/VBoxContainer/TitleSection/MarginContainer/TitleBar" unique_id=574223301]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CloseBtn" type="TextureButton" parent="Control/Window/VBoxContainer/TitleSection/MarginContainer/TitleBar" unique_id=1407883728]
+layout_mode = 2
+focus_mode = 0
+texture_normal = ExtResource("2_2of2h")
+
+[node name="BodySections" type="MarginContainer" parent="Control/Window/VBoxContainer" unique_id=1185037661]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/Window/VBoxContainer/BodySections" unique_id=1297617820]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Control/Window/VBoxContainer/BodySections/VBoxContainer" unique_id=1737916315]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 4
+
+[node name="Output" type="RichTextLabel" parent="Control/Window/VBoxContainer/BodySections/VBoxContainer/MarginContainer" unique_id=1461385842]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+focus_behavior_recursive = 1
+theme_override_colors/selection_color = Color(0.3254902, 0.3372549, 0.3764706, 1)
+theme_override_fonts/normal_font = ExtResource("2_tok2f")
+bbcode_enabled = true
+scroll_following = true
+selection_enabled = true
+
+[node name="Line" type="LineEdit" parent="Control/Window/VBoxContainer/BodySections/VBoxContainer" unique_id=1418277443]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_tok2f")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ev3qo")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_egmcf")
+keep_editing_on_text_submit = true
+right_icon = ExtResource("6_d5qkd")

@@ -18,8 +18,14 @@ boot_splash/stretch_mode=0
 boot_splash/image="uid://ce02t6nhkjqqb"
 config/icon="uid://64b60fys2mlh"
 
+[audio]
+
+buses/default_bus_layout="uid://chv7np8s2h3xb"
+
 [autoload]
 
+Console="*uid://c8ekuc8h2hii4"
+ConVars="*uid://b2ti6lpvyw67a"
 ThreadedLoader="*uid://bjvuayvaxw5a"
 Utils="*uid://cndoo2or440yj"
 Scenes="*uid://b4s588ny4xgju"
@@ -29,6 +35,7 @@ Settings="*uid://bwnpkh85hvs6p"
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
+window/size/mode=4
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 

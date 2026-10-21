@@ -10,7 +10,7 @@ func _ready() -> void:
 	Scenes.scene_load_finished.connect(_on_load_finished)
 	
 	button_2.pressed.connect(func():
-		Utils.prompt(loader, "Confirm", "Change scene?", "Confirm", "Cancel", false, false)
+		Utils.prompt(loader, "Confirm", "Change scene?", "Confirm", "Cancel", true, false)
 	)
 
 func loader() -> void:
