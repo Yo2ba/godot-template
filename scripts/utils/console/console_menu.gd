@@ -5,6 +5,7 @@ extends Control
 @export var line: LineEdit
 @export var close_btn: TextureButton
 @export var title_grabber: PanelContainer
+@export var handle_btn: TextureButton
 
 var input_history: Array[String] = []
 var history_index: int = 0
@@ -13,11 +14,18 @@ var draft_input: String = ""
 var dragging: bool = false
 var drag_offset: Vector2 = Vector2.ZERO
 
+const MIN_WINDOW_SIZE: Vector2 = Vector2(300.0, 300.0)
+
+var resizing: bool = false
+var resize_start_mouse: Vector2 = Vector2.ZERO
+var resize_start_size: Vector2 = Vector2.ZERO
+
 func _ready() -> void:
 	hide()
 	output.focus_mode = Control.FOCUS_CLICK
 	
 	window.position = Settings.console_position
+	window.size = Settings.console_size
 	
 	Console.console_menu = self
 	line.text_submitted.connect(send)
@@ -27,26 +35,57 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
+			var mouse_position: Vector2 = get_global_mouse_position()
+
 			if event.pressed:
-				if title_grabber.get_global_rect().has_point(get_global_mouse_position()):
+				if handle_btn.get_global_rect().has_point(mouse_position):
+					resizing = true
+					resize_start_mouse = mouse_position
+					resize_start_size = window.size
+
+				elif title_grabber.get_global_rect().has_point(mouse_position):
 					dragging = true
-					drag_offset = window.get_global_position() - get_global_mouse_position()
-			elif dragging:
-				dragging = false
-				Settings.console_position = window.position
-	
-	elif event is InputEventMouseMotion and dragging:
-		var screen_size: Vector2 = get_viewport_rect().size
-		var window_size: Vector2 = window.size
-		var new_position: Vector2 = get_global_mouse_position() + drag_offset
+					drag_offset = window.global_position - mouse_position
 
-		new_position.x = clampf(new_position.x, 0.0, screen_size.x - window_size.x)
-		new_position.y = clampf(new_position.y, 0.0, screen_size.y - window_size.y)
+			else:
+				if dragging:
+					dragging = false
+					Settings.console_position = window.position
+				
+				if resizing:
+					resizing = false
+					Settings.console_size = window.size
 
-		window.global_position = new_position
+	elif event is InputEventMouseMotion:
+		if resizing:
+			var screen_size: Vector2 = get_viewport_rect().size
+			var available_size: Vector2 = screen_size - window.global_position
+			var mouse_delta: Vector2 = get_global_mouse_position() - resize_start_mouse
+			var new_size: Vector2 = resize_start_size + mouse_delta
 
-		if not visible:
-			return
+			var min_size: Vector2 = Vector2(
+				minf(MIN_WINDOW_SIZE.x, available_size.x),
+				minf(MIN_WINDOW_SIZE.y, available_size.y)
+			)
+
+			new_size.x = clampf(new_size.x, min_size.x, available_size.x)
+			new_size.y = clampf(new_size.y, min_size.y, available_size.y)
+
+			window.size = new_size
+
+		elif dragging:
+			var screen_size: Vector2 = get_viewport_rect().size
+			var window_size: Vector2 = window.size
+			var max_position: Vector2 = screen_size - window_size
+			var new_position: Vector2 = get_global_mouse_position() + drag_offset
+
+			new_position.x = clampf(new_position.x, 0.0, max_position.x)
+			new_position.y = clampf(new_position.y, 0.0, max_position.y)
+
+			window.global_position = new_position
+
+	if not visible:
+		return
 
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.ctrl_pressed and event.keycode == KEY_C:

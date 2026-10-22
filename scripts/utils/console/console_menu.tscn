@@ -6,6 +6,7 @@
 [ext_resource type="FontFile" uid="uid://4wkebsccq512" path="res://scripts/utils/console/Stratum2-Bold-700.ttf" id="2_egmcf"]
 [ext_resource type="FontFile" uid="uid://ood63wr07bui" path="res://scripts/utils/console/Stratum2-Mono-Regular-400.ttf" id="2_tok2f"]
 [ext_resource type="Texture2D" uid="uid://bhnrl0cqanl5s" path="res://scripts/utils/console/arrow.svg" id="6_d5qkd"]
+[ext_resource type="Texture2D" uid="uid://78haq7unqbaj" path="res://scripts/utils/console/handle.svg" id="7_ev3qo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ohn4w"]
 bg_color = Color(0.13333334, 0.15686275, 0.19215687, 1)
@@ -38,7 +39,7 @@ corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_egmcf"]
 
-[node name="ConsoleMenu" type="Control" unique_id=407086451 node_paths=PackedStringArray("window", "output", "line", "close_btn", "title_grabber")]
+[node name="ConsoleMenu" type="Control" unique_id=407086451 node_paths=PackedStringArray("window", "output", "line", "close_btn", "title_grabber", "handle_btn")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -53,6 +54,7 @@ output = NodePath("Window/VBoxContainer/BodySections/VBoxContainer/MarginContain
 line = NodePath("Window/VBoxContainer/BodySections/VBoxContainer/Line")
 close_btn = NodePath("Window/VBoxContainer/TitleSection/MarginContainer/TitleBar/CloseBtn")
 title_grabber = NodePath("Window/VBoxContainer/TitleSection")
+handle_btn = NodePath("Window/Handle/HandleBtn")
 
 [node name="Window" type="PanelContainer" parent="." unique_id=158625879]
 layout_mode = 0
@@ -131,3 +133,15 @@ keep_editing_on_text_submit = true
 caret_blink = true
 caret_blink_interval = 0.5
 right_icon = ExtResource("6_d5qkd")
+
+[node name="Handle" type="MarginContainer" parent="Window" unique_id=1503330386]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_constants/margin_right = -1
+theme_override_constants/margin_bottom = -1
+
+[node name="HandleBtn" type="TextureButton" parent="Window/Handle" unique_id=1458799249]
+layout_mode = 2
+mouse_default_cursor_shape = 12
+texture_normal = ExtResource("7_ev3qo")
