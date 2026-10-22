@@ -4,3 +4,15 @@
 
 [node name="Main" type="Node" unique_id=1400099146]
 script = ExtResource("1_o5qli")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1504231667]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="CenterContainer" unique_id=715885563]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "QUIT"

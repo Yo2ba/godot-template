@@ -1,24 +1,29 @@
 extends Node
+@warning_ignore_start('shadowed_variable_base_class')
 
-var registry: Dictionary = {}
+var registry: Dictionary[StringName, Dictionary] = {}
 
 func register(
 	target: Object,
-	label: StringName,
+	name: StringName,
 	property: StringName,
-	type: int
+	type: int,
+	description: String = ""
 ) -> void:
+	assert(name == StringName(str(name).to_lower()),
+	"ConVars: ConVar name must be lowercase: '%s'." % name)
+	
 	if not is_instance_valid(target):
-		push_warning("ConVars: Invalid target for '%s'." % label)
+		push_warning("ConVars: Invalid target for '%s'." % name)
 		return
 	
-	if label == &"" or property == &"":
-		push_warning("ConVars: label and property cannot be empty.")
+	if name == &"" or property == &"":
+		push_warning("ConVars: name and property cannot be empty.")
 		return
 	
 	assert(
-		not registry.has(label),
-		"ConVars: Duplicate registration of '%s'." % label
+		not registry.has(name),
+		"ConVars: Duplicate registration of '%s'." % name
 	)
 	
 	if not _has_property(target, property):
@@ -37,18 +42,24 @@ func register(
 		)
 		return
 	
-	registry[label] = {
+	registry[name] = {
 		"target": target,
 		"property": property,
-		"type": type
+		"type": type,
+		"description": description
 	}
 
-func unregister(label: StringName) -> void:
-	if not registry.has(label):
+func unregister(name: StringName) -> void:
+	if not registry.has(name):
 		return
 
-	registry.erase(label)
-	
+	registry.erase(name)
+
+func get_description(name: StringName) -> String:
+	if not registry.has(name):
+		return ""
+
+	return registry[name]["description"]
 
 func _has_property(
 	target: Object,
@@ -61,42 +72,42 @@ func _has_property(
 	return false
 
 
-func exists(label: StringName) -> bool:
-	return registry.has(label)
+func exists(name: StringName) -> bool:
+	return registry.has(name)
 
-func get_value(label: StringName) -> Variant:
-	if not registry.has(label):
-		push_warning("ConVars: Unknown ConVar '%s'." % label)
+func get_value(name: StringName) -> Variant:
+	if not registry.has(name):
+		push_warning("ConVars: Unknown ConVar '%s'." % name)
 		return null
 
-	var entry: Dictionary = registry[label]
+	var entry: Dictionary = registry[name]
 	var target: Object = entry["target"]
 
 	if not is_instance_valid(target):
-		push_warning("ConVars: Owner of '%s' is invalid." % label)
+		push_warning("ConVars: Owner of '%s' is invalid." % name)
 		return null
 
 	return target.get(entry["property"])
 
 func set_value(
-	label: StringName,
+	name: StringName,
 	value: Variant
 ) -> void:
-	if not registry.has(label):
-		push_warning("ConVars: Unknown ConVar '%s'." % label)
+	if not registry.has(name):
+		push_warning("ConVars: Unknown ConVar '%s'." % name)
 		return
 
-	var entry: Dictionary = registry[label]
+	var entry: Dictionary = registry[name]
 	var target: Object = entry["target"]
 
 	if not is_instance_valid(target):
-		push_warning("ConVars: Owner of '%s' is invalid." % label)
+		push_warning("ConVars: Owner of '%s' is invalid." % name)
 		return
 
 	if typeof(value) != entry["type"]:
 		push_warning(
 			"ConVars: Invalid type for '%s'. Expected %s, received %s."
-			% [label, type_string(entry["type"]), type_string(typeof(value))]
+			% [name, type_string(entry["type"]), type_string(typeof(value))]
 		)
 		return
 
@@ -105,10 +116,11 @@ func set_value(
 
 func get_names(prefix: String = "") -> Array[StringName]:
 	var names: Array[StringName] = []
+	var normalized_prefix: String = prefix.to_lower()
 
-	for key: StringName in registry:
-		if String(key).begins_with(prefix):
-			names.append(key)
+	for name: StringName in registry:
+		if str(name).begins_with(normalized_prefix):
+			names.append(name)
 
 	names.sort()
 	return names

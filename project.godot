@@ -26,6 +26,7 @@ buses/default_bus_layout="uid://chv7np8s2h3xb"
 
 Console="*uid://c8ekuc8h2hii4"
 ConVars="*uid://b2ti6lpvyw67a"
+Commands="*uid://wa1y1lr1p6ts"
 ThreadedLoader="*uid://bjvuayvaxw5a"
 Utils="*uid://cndoo2or440yj"
 Scenes="*uid://b4s588ny4xgju"

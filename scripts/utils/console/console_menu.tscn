@@ -144,6 +144,7 @@ theme_override_fonts/normal_font = ExtResource("2_tok2f")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_ev3qo")
 bbcode_enabled = true
 scroll_following = true
+autowrap_mode = 0
 context_menu_enabled = true
 selection_enabled = true
 drag_and_drop_selection_enabled = false

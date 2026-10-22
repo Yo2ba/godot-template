@@ -50,14 +50,14 @@ var console_size: Vector2 = Vector2(600.0, 400.0):
 
 var config: ConfigFile = ConfigFile.new()
 #const CONFIG_PATH: String = "user://settings.cfg"
-const CONFIG_PATH: String = "res://settings.cfg"
+const CONFIG_PATH: String = "user://settings.cfg"
 var is_loading: bool = false
 
 
 func _ready() -> void:
 	load_config()
-	ConVars.register(self, &"music", &"music_volume", TYPE_FLOAT)
-	ConVars.register(self, &"sfx", &"sfx_volume", TYPE_FLOAT)
+	ConVars.register(self, &"music", &"music_volume", TYPE_FLOAT, "Music volume")
+	ConVars.register(self, &"sfx", &"sfx_volume", TYPE_FLOAT, "Sfx volume")
 
 func _exit_tree() -> void:
 	save_config()
@@ -72,8 +72,8 @@ func load_config() -> void:
 		return
 	
 	is_loading = true
-	console_position = config.get_value("settings", "console_position", Vector2.ZERO)
-	console_size = config.get_value("settings", "console_size", Vector2(600.0, 400.0))
+	console_position = config.get_value("settings", "console_position", Vector2(DisplayServer.screen_get_size().x / 2.0 - 400, DisplayServer.screen_get_size().y / 2.0 - 300))
+	console_size = config.get_value("settings", "console_size", Vector2(800.0, 600.0))
 	music_volume = config.get_value("settings", "music_volume", 1.0)
 	sfx_volume = config.get_value("settings", "sfx_volume", 1.0)
 	is_loading = false

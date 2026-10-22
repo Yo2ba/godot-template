@@ -1,7 +1,22 @@
 extends Node
 
+@onready var button: Button = $CenterContainer/Button
 
 func _ready() -> void:
+	initial_messages()
+	button.pressed.connect(func():
+		Utils.prompt(
+			func(): Commands.execute(&"quit"),
+			"Quit",
+			"Are you sure you want to quit?",
+			"Quit",
+			"Return",
+			true
+		)
+		
+	)
+
+func initial_messages() -> void:
 	Console.color(Color.AQUA)
 	Console.log("###System###")
 	Console.log("Datetime: " + Time.get_datetime_string_from_system())
@@ -28,4 +43,4 @@ func _ready() -> void:
 	Console.log("Launch options: " + str(OS.get_cmdline_user_args()))
 	Console.log("Debug: " + str(OS.has_feature("debug")))
 	
-	Console.color(Color.WHITE)
+	Console.color()
