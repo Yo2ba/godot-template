@@ -2,11 +2,15 @@
 
 [ext_resource type="Script" uid="uid://clww6upaan6y3" path="res://scripts/utils/console/console_menu.gd" id="1_5wnhe"]
 [ext_resource type="Theme" uid="uid://bln5anbi0dt0n" path="res://utils/api_theme.tres" id="1_ev3qo"]
-[ext_resource type="Texture2D" uid="uid://cx0gdlg2ddry3" path="res://scripts/utils/console/cross.svg" id="2_2of2h"]
 [ext_resource type="FontFile" uid="uid://4wkebsccq512" path="res://scripts/utils/console/Stratum2-Bold-700.ttf" id="2_egmcf"]
 [ext_resource type="FontFile" uid="uid://ood63wr07bui" path="res://scripts/utils/console/Stratum2-Mono-Regular-400.ttf" id="2_tok2f"]
+[ext_resource type="Texture2D" uid="uid://cdeoa2y05p1su" path="res://scripts/utils/console/cross_n.svg" id="4_g4cmj"]
+[ext_resource type="Texture2D" uid="uid://cddbfvbjjsbtt" path="res://scripts/utils/console/cross_p.svg" id="5_ew1rg"]
 [ext_resource type="Texture2D" uid="uid://bhnrl0cqanl5s" path="res://scripts/utils/console/arrow.svg" id="6_d5qkd"]
-[ext_resource type="Texture2D" uid="uid://78haq7unqbaj" path="res://scripts/utils/console/handle.svg" id="7_ev3qo"]
+[ext_resource type="Texture2D" uid="uid://dmepg4r1kfmti" path="res://scripts/utils/console/cross_h.svg" id="6_rokao"]
+[ext_resource type="Texture2D" uid="uid://b1iuv0v8ix8m6" path="res://scripts/utils/console/handle_n.svg" id="7_rnlvh"]
+[ext_resource type="Texture2D" uid="uid://bdf35gpf2reny" path="res://scripts/utils/console/handle_p.svg" id="8_qv6wu"]
+[ext_resource type="Texture2D" uid="uid://cslw1nmeorq1r" path="res://scripts/utils/console/handle_h.svg" id="9_g4cmj"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ohn4w"]
 bg_color = Color(0.13333334, 0.15686275, 0.19215687, 1)
@@ -26,6 +30,8 @@ border_width_bottom = 1
 border_color = Color(0.22352941, 0.24313726, 0.27450982, 1)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_15n48"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ev3qo"]
 
@@ -80,10 +86,24 @@ theme_override_constants/margin_bottom = 8
 [node name="TitleBar" type="HBoxContainer" parent="Window/VBoxContainer/TitleSection/MarginContainer" unique_id=191726735]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="Window/VBoxContainer/TitleSection/MarginContainer/TitleBar" unique_id=299643952]
+[node name="Title" type="Button" parent="Window/VBoxContainer/TitleSection/MarginContainer/TitleBar" unique_id=2085324251]
 layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.8745098, 0.8745098, 0.8745098, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_egmcf")
 theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxEmpty_15n48")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxEmpty_15n48")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_15n48")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxEmpty_15n48")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_15n48")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxEmpty_15n48")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_15n48")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxEmpty_15n48")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_15n48")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxEmpty_15n48")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_15n48")
 text = "CONSOLE"
 
 [node name="Control" type="Control" parent="Window/VBoxContainer/TitleSection/MarginContainer/TitleBar" unique_id=574223301]
@@ -93,7 +113,9 @@ size_flags_horizontal = 3
 [node name="CloseBtn" type="TextureButton" parent="Window/VBoxContainer/TitleSection/MarginContainer/TitleBar" unique_id=1407883728]
 layout_mode = 2
 focus_mode = 0
-texture_normal = ExtResource("2_2of2h")
+texture_normal = ExtResource("4_g4cmj")
+texture_pressed = ExtResource("5_ew1rg")
+texture_hover = ExtResource("6_rokao")
 
 [node name="BodySections" type="MarginContainer" parent="Window/VBoxContainer" unique_id=1185037661]
 layout_mode = 2
@@ -114,7 +136,7 @@ theme_override_constants/margin_left = 4
 [node name="Output" type="RichTextLabel" parent="Window/VBoxContainer/BodySections/VBoxContainer/MarginContainer" unique_id=1461385842]
 layout_mode = 2
 size_flags_vertical = 3
-focus_mode = 1
+focus_mode = 2
 theme_override_colors/selection_color = Color(0.3254902, 0.3372549, 0.3764706, 1)
 theme_override_fonts/normal_font = ExtResource("2_tok2f")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_ev3qo")
@@ -146,4 +168,6 @@ theme_override_constants/margin_bottom = -1
 layout_mode = 2
 focus_mode = 0
 mouse_default_cursor_shape = 12
-texture_normal = ExtResource("7_ev3qo")
+texture_normal = ExtResource("7_rnlvh")
+texture_pressed = ExtResource("8_qv6wu")
+texture_hover = ExtResource("9_g4cmj")
