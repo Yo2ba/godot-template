@@ -126,6 +126,7 @@ drag_and_drop_selection_enabled = false
 
 [node name="Line" type="LineEdit" parent="Window/VBoxContainer/BodySections/VBoxContainer" unique_id=1418277443]
 layout_mode = 2
+focus_mode = 1
 theme_override_fonts/font = ExtResource("2_tok2f")
 theme_override_styles/normal = SubResource("StyleBoxFlat_ev3qo")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_egmcf")
@@ -143,5 +144,6 @@ theme_override_constants/margin_bottom = -1
 
 [node name="HandleBtn" type="TextureButton" parent="Window/Handle" unique_id=1458799249]
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 12
 texture_normal = ExtResource("7_ev3qo")

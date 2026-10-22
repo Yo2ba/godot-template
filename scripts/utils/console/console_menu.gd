@@ -86,6 +86,12 @@ func _input(event: InputEvent) -> void:
 
 	if not visible:
 		return
+	
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_ESCAPE:
+			Console.toggle_console()
+			get_viewport().set_input_as_handled()
+			return
 
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.ctrl_pressed and event.keycode == KEY_C:
@@ -93,6 +99,11 @@ func _input(event: InputEvent) -> void:
 				DisplayServer.clipboard_set(output.get_selected_text())
 				get_viewport().set_input_as_handled()
 				return
+	
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_TAB and line.has_focus():
+			get_viewport().set_input_as_handled()
+			return
 
 	if not line.has_focus():
 		return
