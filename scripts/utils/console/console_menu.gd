@@ -108,7 +108,7 @@ func _input(event: InputEvent) -> void:
 	if not line.has_focus():
 		return
 
-	if event is not InputEventKey or not event.pressed or event.echo:
+	if event is not InputEventKey or not event.pressed:
 		return
 
 	match event.keycode:
@@ -161,6 +161,9 @@ func send(text: String) -> void:
 		&"log":
 			savelog()
 			return
+		
+		&"quit":
+			get_tree().quit()
 	
 	if not ConVars.exists(label):
 		Console.log("Unknown command: %s" %label)
@@ -229,7 +232,7 @@ func add_visible(message: String, color: Color = Color.WHITE) -> void:
 func savelog() -> void:
 	var now: Dictionary = Time.get_datetime_dict_from_system()
 	
-	var path: String = "user://console_%04d-%02d-%02d_%02d-%02d-%02d.txt" % [
+	var path: String = "user://console_%04d-%02d-%02d_%02d-%02d-%02d.log" % [
 		now["year"],
 		now["month"],
 		now["day"],
