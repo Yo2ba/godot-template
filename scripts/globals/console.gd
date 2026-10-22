@@ -2,6 +2,7 @@ extends Node
 
 const CONSOLE_SCENE: PackedScene = preload('uid://nugh2wokqnq3')
 
+var current_color: Color = Color.WHITE
 
 var console_menu: Control
 var history: String
@@ -19,23 +20,24 @@ func _input(event: InputEvent) -> void:
 func toggle_console() -> void:
 	console_menu.visible = !console_menu.visible
 
-func log(message: String) -> void:
-	var unix_time: float = Time.get_unix_time_from_system()
-	var datetime: Dictionary = Time.get_datetime_dict_from_unix_time(int(unix_time))
-	var milliseconds: int = int(fmod(unix_time, 1.0) * 1000.0)
+func color(value: Color = Color.WHITE) -> void:
+	current_color = value
 
-	var timestamp: String = "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ" % [
-		datetime["year"],
-		datetime["month"],
-		datetime["day"],
-		datetime["hour"],
-		datetime["minute"],
-		datetime["second"],
-		milliseconds
-	]
 
-	var entry: String = "[`%s`] %s" % [timestamp, message]
-	history += entry + "\n"
-
+func log(... args: Array) -> void:
+	if args.is_empty():
+		return
+	
+	var message_color: Color = current_color
+	
+	if args.back() is Color:
+		message_color = args.pop_back()
+	
+	var message: String = " ".join(
+		args.map(func(arg: Variant) -> String: return str(arg))
+	)
+	
+	history += message + "\n"
+	
 	if is_instance_valid(console_menu):
-		console_menu.add_visible(message)
+		console_menu.add_visible(message, message_color)
