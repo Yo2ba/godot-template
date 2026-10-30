@@ -50,8 +50,16 @@ corner_radius_bottom_left = 2
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
 bg_color = Color(0.22352941, 0.24313726, 0.27450982, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4cmj"]
+bg_color = Color(0.31679213, 0.3429655, 0.38484284, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hfig2"]
+
 [sub_resource type="GDScript" id="GDScript_g4cmj"]
 script/source = "extends ItemList
+
+@export var marker_top: Control
+@export var marker_bottom: Control
 
 const LINE_HEIGHT: int = 23
 const MAX_HEIGHT: int = 178
@@ -63,9 +71,19 @@ func resize() -> void:
 	var count: int = get_item_count() 
 	size.y = 0 if count == 0 else clampi(LINE_HEIGHT * count + count, LINE_HEIGHT, MAX_HEIGHT)
 	
+	update_position()
+	
+func update_position() -> void:
+	var window_height: float = get_viewport().get_visible_rect().size.y
+	#var window_height: float = get_viewport_rect().size.y
+	if marker_bottom.global_position.y + size.y >= window_height:
+		position.y = marker_top.position.y - size.y
+	else:
+		position.y = marker_bottom.position.y
+	
 "
 
-[node name="ConsoleMenu" type="Control" unique_id=407086451 node_paths=PackedStringArray("window", "output", "line", "close_btn", "title_grabber", "handle_btn")]
+[node name="ConsoleMenu" type="Control" unique_id=407086451 node_paths=PackedStringArray("window", "output", "line", "close_btn", "title_grabber", "handle_btn", "hint_list")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -81,6 +99,7 @@ line = NodePath("Window/VBoxContainer/BodySections/VBoxContainer/Line")
 close_btn = NodePath("Window/VBoxContainer/TitleSection/MarginContainer/TitleBar/CloseBtn")
 title_grabber = NodePath("Window/VBoxContainer/TitleSection")
 handle_btn = NodePath("Window/Handle/HandleBtn")
+hint_list = NodePath("Window/VBoxContainer/BodySections/VBoxContainer/Line/HintList")
 
 [node name="Window" type="PanelContainer" parent="." unique_id=158625879]
 layout_mode = 0
@@ -179,22 +198,47 @@ caret_blink = true
 caret_blink_interval = 0.5
 right_icon = ExtResource("6_d5qkd")
 
-[node name="HintList" type="ItemList" parent="Window/VBoxContainer/BodySections/VBoxContainer/Line" unique_id=138305594]
+[node name="MarkerTop" type="Control" parent="Window/VBoxContainer/BodySections/VBoxContainer/Line" unique_id=1755612244]
+layout_mode = 1
+anchors_preset = 0
+offset_top = -5.0
+offset_bottom = -5.0
+
+[node name="MarkerBottom" type="Control" parent="Window/VBoxContainer/BodySections/VBoxContainer/Line" unique_id=1400542093]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = 5.0
+offset_bottom = 5.0
+grow_vertical = 0
+
+[node name="HintList" type="ItemList" parent="Window/VBoxContainer/BodySections/VBoxContainer/Line" unique_id=138305594 node_paths=PackedStringArray("marker_top", "marker_bottom")]
 custom_minimum_size = Vector2(512, 0)
 layout_mode = 0
-offset_top = 34.0
-offset_right = 96.0
-offset_bottom = 114.0
+offset_top = 33.0
+offset_right = 512.0
+offset_bottom = 113.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.8117647, 0.8117647, 0.8117647, 1)
+theme_override_colors/font_hovered_color = Color(0.8117647, 0.8117647, 0.8117647, 1)
+theme_override_colors/font_hovered_selected_color = Color(0.8117647, 0.8117647, 0.8117647, 1)
+theme_override_colors/font_selected_color = Color(0.8117647, 0.8117647, 0.8117647, 1)
+theme_override_constants/h_separation = 8
 theme_override_fonts/font = ExtResource("2_tok2f")
 theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
-item_count = 6
-item_0/text = "2eqweqwe"
-item_1/text = "123213"
-item_2/text = "rewr"
-item_3/text = "w4r"
-item_4/text = "retret"
-item_5/text = "trete"
+theme_override_styles/hovered = SubResource("StyleBoxFlat_g4cmj")
+theme_override_styles/hovered_selected = SubResource("StyleBoxFlat_g4cmj")
+theme_override_styles/selected = SubResource("StyleBoxEmpty_hfig2")
+allow_search = false
+wraparound_items = false
+item_count = 3
+item_0/text = "eqwewq"
+item_1/text = "eqweqwe"
+item_2/text = "qweq"
 script = SubResource("GDScript_g4cmj")
+marker_top = NodePath("../MarkerTop")
+marker_bottom = NodePath("../MarkerBottom")
 
 [node name="Handle" type="MarginContainer" parent="Window" unique_id=1503330386]
 layout_mode = 2

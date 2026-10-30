@@ -1,10 +1,10 @@
 [gd_resource type="Theme" format=3 uid="uid://bln5anbi0dt0n"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sgp6g"]
-bg_color = Color(0.22352941, 0.24313726, 0.27450982, 1)
+bg_color = Color(0.2667997, 0.28945366, 0.32570004, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xctaf"]
-bg_color = Color(0.2667997, 0.28945366, 0.32570004, 1)
+bg_color = Color(0.31663847, 0.34382322, 0.3846004, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o5qli"]
 content_margin_left = 4.0

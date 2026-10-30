@@ -7,6 +7,7 @@ extends Control
 @export var close_btn: TextureButton
 @export var title_grabber: PanelContainer
 @export var handle_btn: TextureButton
+@export var hint_list: ItemList
 
 var input_history: Array[String] = []
 var history_index: int = 0
@@ -135,6 +136,7 @@ func _input(event: InputEvent) -> void:
 			new_size.y = clampf(new_size.y, min_size.y, available_size.y)
 
 			window.size = new_size
+			hint_list.update_position()
 
 		elif dragging:
 			var screen_size: Vector2 = get_viewport_rect().size
@@ -146,6 +148,7 @@ func _input(event: InputEvent) -> void:
 			new_position.y = clampf(new_position.y, 0.0, max_position.y)
 
 			window.global_position = new_position
+			hint_list.update_position()
 
 	if event is InputEventKey and event.pressed and not event.echo:
 		if line.has_focus():
