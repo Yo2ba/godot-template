@@ -1,5 +1,6 @@
+
 extends Control
-@warning_ignore_start('shadowed_variable_base_class')
+@warning_ignore_start("shadowed_variable_base_class")
 
 @export var window: PanelContainer
 @export var output: RichTextLabel
@@ -30,74 +31,73 @@ var hint_confirmed: bool = false
 var setting_hint: bool = false
 var hint_blocked: bool = false
 
+
 func _ready() -> void:
 	register_commands()
 	hide()
+
 	output.focus_mode = Control.FOCUS_CLICK
-	
+
 	line.text_changed.connect(_on_line_text_changed)
-	
-	window.position = Settings.console_position
-	window.size = Settings.console_size
-	
-	Console.console_menu = self
 	line.text_submitted.connect(send)
+
+	hint_list.item_clicked.connect(_on_hint_list_item_clicked)
+
 	close_btn.pressed.connect(func(): Console.toggle_console())
 	visibility_changed.connect(func(): if visible: line.grab_focus() else: line.release_focus())
+
+	window.position = Settings.console_position
+	window.size = Settings.console_size
+
+	Console.console_menu = self
+
+	history_index = input_history.size()
+
 
 func register_commands() -> void:
 	Commands.register(&"clear", clear, "Clears the console log")
 	Commands.register(&"log", savelog, "Saves console log")
-	Commands.register(&"echo", echo, "Echo text to console.")
+	Commands.register(&"echo", echo, "Echo text to console")
 	Commands.register(&"quit", func(): get_tree().quit(), "Quit the game")
 	Commands.register(&"help", help, "Shows command descriptions")
-	
+
 
 func help(name: String = "") -> void:
-	if name.is_empty():
-		var names: Array[StringName] = Commands.get_all_names()
+	if not name.is_empty():
+		var entry: StringName = StringName(name.to_lower())
 
-		for cvar: StringName in ConVars.get_all_names():
-			if not names.has(cvar):
-				names.append(cvar)
-
-		names.sort()
-
-		for command: StringName in names:
-			var description: String = Commands.get_description(command)
-
-			if description.is_empty():
-				description = ConVars.get_description(command)
-
-			Console.log("[Console]", "%s - %s" % [
-				command,
-				description
-			])
-
+		if Commands.exists(entry):
+			Console.log("[Console]", "%s - %s" % [entry, Commands.get_description(entry)])
+		elif ConVars.exists(entry):
+			Console.log("[Console]", "%s - %s" % [entry, ConVars.get_description(entry)])
+		else:
+			Console.log("[Console]", "help: no cvar or command named %s" % name)
 		return
 
-	var command: StringName = StringName(name.to_lower())
+	var names: Array[StringName] = Commands.get_all_names()
 
-	if Commands.exists(command):
-		Console.log("[Console]", "%s - %s" % [
-			command,
-			Commands.get_description(command)
-		])
-		return
+	for entry: StringName in ConVars.get_all_names():
+		if not names.has(entry):
+			names.append(entry)
 
-	if ConVars.exists(command):
-		Console.log("[Console]", "%s - %s" % [
-			command,
-			ConVars.get_description(command)
-		])
-		return
+	names.sort_custom(func(a: StringName, b: StringName) -> bool:
+		return str(a).to_lower() < str(b).to_lower()
+	)
 
-	Console.log("[Console]", "help:  no cvar or command named %s" % name)
+	for entry: StringName in names:
+		var description: String = ""
+
+		if Commands.exists(entry):
+			description = Commands.get_description(entry)
+		elif ConVars.exists(entry):
+			description = ConVars.get_description(entry)
+
+		Console.log("[Console]", "%s - %s" % [entry, description])
 
 func _input(event: InputEvent) -> void:
 	if not visible:
 		return
-	
+
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		var mouse_position: Vector2 = get_global_mouse_position()
 
@@ -163,10 +163,13 @@ func _input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 
-		if event.keycode == KEY_C and event.ctrl_pressed and output.has_selection():
-			DisplayServer.clipboard_set(output.get_selected_text())
-			get_viewport().set_input_as_handled()
-			return
+		if event.keycode == KEY_C and event.ctrl_pressed:
+			var selected_text: String = output.get_selected_text()
+			
+			if not selected_text.is_empty():
+				DisplayServer.clipboard_set(selected_text)
+				get_viewport().set_input_as_handled()
+				return
 
 	if not line.has_focus():
 		return
@@ -175,46 +178,59 @@ func _input(event: InputEvent) -> void:
 		return
 
 	if event.keycode == KEY_TAB:
-		confirm_or_cycle_hint()
-		get_viewport().set_input_as_handled()
+		if confirm_or_cycle_hint():
+			get_viewport().set_input_as_handled()
 		return
 
-	if event.keycode == KEY_RIGHT and hint_active and not hint_confirmed:
+	if event.keycode == KEY_RIGHT and hint_active and hint_index >= 0:
 		accept_hint(str(hint_matches[hint_index]))
-		get_viewport().set_input_as_handled()
-		return
-
-	if event.keycode == KEY_DOWN and hint_active:
-		confirm_or_cycle_hint()
 		get_viewport().set_input_as_handled()
 		return
 
 	match event.keycode:
 		KEY_UP:
-			if input_history.is_empty():
-				return
-
-			if history_index == input_history.size():
-				draft_input = line.text
-
-			history_index = maxi(history_index - 1, 0)
-			line.text = input_history[history_index]
-			line.caret_column = line.text.length()
+			navigate_history(-1)
 			get_viewport().set_input_as_handled()
 
 		KEY_DOWN:
-			if history_index >= input_history.size():
-				return
-
-			history_index += 1
-
-			if history_index == input_history.size():
-				line.text = draft_input
-			else:
-				line.text = input_history[history_index]
-
-			line.caret_column = line.text.length()
+			navigate_history(1)
 			get_viewport().set_input_as_handled()
+
+
+func navigate_history(direction: int) -> void:
+	var max_index: int = input_history.size() + hint_matches.size()
+
+	var new_index: int = clampi(
+		history_index + direction,
+		0,
+		max_index
+	)
+
+	if new_index == history_index:
+		return
+
+	history_index = new_index
+
+	var text: String
+
+	if history_index < input_history.size():
+		text = input_history[history_index]
+
+	elif history_index == input_history.size():
+		text = draft_input
+
+	else:
+		var index: int = history_index - input_history.size() - 1
+		text = hint_list.get_item_text(index)
+
+	setting_hint = true
+
+	line.text = text
+	line.deselect()
+	line.caret_column = line.text.length()
+
+	setting_hint = false
+
 
 func send(text: String) -> void:
 	var input: String = text.strip_edges()
@@ -235,6 +251,7 @@ func send(text: String) -> void:
 	draft_input = ""
 
 	line.clear()
+	reset_hints()
 
 	var name: StringName = StringName(parts[0])
 	var lookup_name: StringName = StringName(str(name).to_lower())
@@ -262,7 +279,7 @@ func send(text: String) -> void:
 
 		Console.log("[Console]", "%s = %s" % [name, display_value])
 		return
-	
+
 	var value_text: String = " ".join(parts.slice(1))
 	var current_value: Variant = ConVars.get_value(lookup_name)
 	var value: Variant
@@ -304,15 +321,19 @@ func send(text: String) -> void:
 
 	ConVars.set_value(lookup_name, value)
 
+
 func escape(text: String) -> String:
 	return text.replace("[", "[lb]")
+
 
 func clear() -> void:
 	Console.history = ""
 	output.text = ""
 
+
 func echo(text: String = "") -> void:
 	Console.log("[Console]", text)
+
 
 func add_visible(message: String, color: Color = Color.WHITE) -> void:
 	output.append_text(
@@ -322,9 +343,10 @@ func add_visible(message: String, color: Color = Color.WHITE) -> void:
 		]
 	)
 
+
 func savelog() -> void:
 	var now: Dictionary = Time.get_datetime_dict_from_system()
-	
+
 	var path: String = "user://console_%04d-%02d-%02d_%02d-%02d-%02d.log" % [
 		now["year"],
 		now["month"],
@@ -333,17 +355,18 @@ func savelog() -> void:
 		now["minute"],
 		now["second"]
 	]
-	
+
 	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
-	
+
 	if file == null:
 		Console.log("Failed to save log: " + str(FileAccess.get_open_error()))
 		return
-	
+
 	file.store_string(Console.history)
 	file.close()
-	
-	Console.log("Log saved: %s" %path)
+
+	Console.log("Log saved: %s" % path)
+
 
 func parse_arguments(input: String) -> PackedStringArray:
 	var args: PackedStringArray = []
@@ -390,7 +413,8 @@ func parse_arguments(input: String) -> PackedStringArray:
 	if token_started:
 		args.append(current)
 
-	return args	
+	return args
+
 
 func _on_line_text_changed(text: String) -> void:
 	if setting_hint:
@@ -398,10 +422,10 @@ func _on_line_text_changed(text: String) -> void:
 
 	reset_hints()
 
-	if hint_blocked:
-		return
+	history_index = input_history.size()
+	draft_input = text
 
-	if text.is_empty() or text.contains(" "):
+	if hint_blocked or text.is_empty() or text.contains(" "):
 		return
 
 	hint_prefix = text.to_lower()
@@ -418,13 +442,50 @@ func _on_line_text_changed(text: String) -> void:
 		if str(name).begins_with(hint_prefix):
 			hint_matches.append(name)
 
+	hint_active = not hint_matches.is_empty()
+
+	if hint_active:	
+		hint_index = 0
+		set_hint(str(hint_matches[hint_index]), text.length())
+
+	update_hint_list()
+
+func update_hint_list() -> void:
+	hint_list.clear()
+
+	for name: StringName in hint_matches:
+		if ConVars.exists(name):
+			var value: Variant = ConVars.get_value(name)
+			var display_value: String = str(value)
+
+			if value is float and is_equal_approx(value, roundf(value)):
+				display_value = str(roundi(value))
+
+			hint_list.add_item("%s %s" % [name, display_value])
+		else:
+			hint_list.add_item(str(name))
+
+	hint_list.resize()
+	hint_list.update_position()
+
 	if hint_matches.is_empty():
-		return
+		hint_list.hide()
+	else:
+		hint_list.show()
 
-	hint_active = true
-	hint_index = 0
+func _on_hint_list_item_clicked(index: int, _at_position: Vector2, _mouse_button_index: int) -> void:
+	var completion: String = hint_list.get_item_text(index)
 
-	set_hint(str(hint_matches[hint_index]), text.length())
+	reset_hints()
+
+	setting_hint = true
+	line.text = completion
+	line.deselect()
+	line.caret_column = completion.length()
+	setting_hint = false
+
+	draft_input = completion
+	history_index = input_history.size()
 
 func set_hint(completion: String, selection_start: int) -> void:
 	setting_hint = true
@@ -440,13 +501,23 @@ func confirm_or_cycle_hint() -> bool:
 	if not hint_active or hint_matches.is_empty():
 		return false
 
-	if hint_confirmed:
-		hint_index = (hint_index + 1) % hint_matches.size()
-	else:
+	if not hint_confirmed:
 		hint_confirmed = true
+	else:
+		hint_index = (hint_index + 1) % hint_matches.size()
+
+	history_index = input_history.size() + 1 + hint_index
 
 	var completion: String = str(hint_matches[hint_index])
-	accept_hint(completion)
+
+	if ConVars.exists(StringName(completion)):
+		completion += " "
+
+	setting_hint = true
+	line.text = completion
+	line.deselect()
+	line.caret_column = completion.length()
+	setting_hint = false
 
 	return true
 
@@ -463,7 +534,12 @@ func accept_hint(completion: String) -> void:
 	line.caret_column = completion.length()
 
 	setting_hint = false
+
+	draft_input = completion
+	history_index = input_history.size()
+
 	reset_hints()
+
 
 func reset_hints() -> void:
 	hint_matches.clear()
@@ -472,11 +548,20 @@ func reset_hints() -> void:
 	hint_active = false
 	hint_confirmed = false
 
+	hint_list.clear()
+	hint_list.hide()
+
+
 func set_history_input(text: String) -> void:
 	reset_hints()
 
 	setting_hint = true
+
 	line.text = text
 	line.deselect()
 	line.caret_column = line.text.length()
+
 	setting_hint = false
+
+	draft_input = text
+	history_index = input_history.size()
