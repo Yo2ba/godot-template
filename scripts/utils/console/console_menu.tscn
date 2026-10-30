@@ -53,7 +53,7 @@ bg_color = Color(0.22352941, 0.24313726, 0.27450982, 1)
 [sub_resource type="GDScript" id="GDScript_g4cmj"]
 script/source = "extends ItemList
 
-const LINE_HEIGHT: int = 26
+const LINE_HEIGHT: int = 23
 const MAX_HEIGHT: int = 178
 
 func _ready() -> void:
@@ -179,23 +179,21 @@ caret_blink = true
 caret_blink_interval = 0.5
 right_icon = ExtResource("6_d5qkd")
 
-[node name="ItemList" type="ItemList" parent="Window/VBoxContainer/BodySections/VBoxContainer/Line" unique_id=138305594]
+[node name="HintList" type="ItemList" parent="Window/VBoxContainer/BodySections/VBoxContainer/Line" unique_id=138305594]
 custom_minimum_size = Vector2(512, 0)
 layout_mode = 0
 offset_top = 34.0
 offset_right = 96.0
 offset_bottom = 114.0
+theme_override_fonts/font = ExtResource("2_tok2f")
 theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
-item_count = 9
+item_count = 6
 item_0/text = "2eqweqwe"
 item_1/text = "123213"
 item_2/text = "rewr"
-item_3/text = "fdsfs"
-item_4/text = "sdfsdfds"
-item_5/text = "fsdfs"
-item_6/text = "sdfsfds"
-item_7/text = "fsdfsf"
-item_8/text = "fsdfsfds"
+item_3/text = "w4r"
+item_4/text = "retret"
+item_5/text = "trete"
 script = SubResource("GDScript_g4cmj")
 
 [node name="Handle" type="MarginContainer" parent="Window" unique_id=1503330386]
