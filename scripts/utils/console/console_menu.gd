@@ -94,28 +94,30 @@ func help(name: String = "") -> void:
 	Console.log("[Console]", "help:  no cvar or command named %s" % name)
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			var mouse_position: Vector2 = get_global_mouse_position()
+	if not visible:
+		return
+	
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		var mouse_position: Vector2 = get_global_mouse_position()
 
-			if event.pressed:
-				if handle_btn.get_global_rect().has_point(mouse_position):
-					resizing = true
-					resize_start_mouse = mouse_position
-					resize_start_size = window.size
+		if event.pressed:
+			if handle_btn.get_global_rect().has_point(mouse_position):
+				resizing = true
+				resize_start_mouse = mouse_position
+				resize_start_size = window.size
 
-				elif title_grabber.get_global_rect().has_point(mouse_position):
-					dragging = true
-					drag_offset = window.global_position - mouse_position
+			elif title_grabber.get_global_rect().has_point(mouse_position):
+				dragging = true
+				drag_offset = window.global_position - mouse_position
 
-			else:
-				if dragging:
-					dragging = false
-					Settings.console_position = window.position
-				
-				if resizing:
-					resizing = false
-					Settings.console_size = window.size
+		else:
+			if dragging:
+				dragging = false
+				Settings.console_position = window.position
+
+			if resizing:
+				resizing = false
+				Settings.console_size = window.size
 
 	elif event is InputEventMouseMotion:
 		if resizing:
@@ -145,60 +147,45 @@ func _input(event: InputEvent) -> void:
 
 			window.global_position = new_position
 
-	if not visible:
-		return
-		
 	if event is InputEventKey and event.pressed and not event.echo:
-		if line.has_focus() and event.keycode != KEY_BACKSPACE:
-			if event.unicode > 0:
+		if line.has_focus():
+			if event.keycode == KEY_BACKSPACE:
+				hint_blocked = true
+				reset_hints()
+			elif event.unicode > 0:
 				hint_blocked = false
-	
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_BACKSPACE and line.has_focus() and hint_active and not hint_confirmed:
-			var prefix: String = line.text.left(line.caret_column)
 
-			setting_hint = true
-			line.text = prefix
-			line.deselect()
-			line.caret_column = line.text.length()
-			setting_hint = false
-
-			reset_hints()
-			hint_blocked = true
-
-			get_viewport().set_input_as_handled()
-			return
-	
-	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_ESCAPE:
-			Console.toggle_console()
+			hide()
 			get_viewport().set_input_as_handled()
 			return
 
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.ctrl_pressed and event.keycode == KEY_C:
-			if output.get_selection_from() != -1:
-				DisplayServer.clipboard_set(output.get_selected_text())
-				get_viewport().set_input_as_handled()
-				return
-	
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_TAB and line.has_focus():
-			confirm_or_cycle_hint()
+		if event.keycode == KEY_C and event.ctrl_pressed and output.has_selection():
+			DisplayServer.clipboard_set(output.get_selected_text())
 			get_viewport().set_input_as_handled()
 			return
 
 	if not line.has_focus():
 		return
 
-	if event is not InputEventKey or not event.pressed:
+	if event is not InputEventKey or not event.pressed or event.echo:
 		return
-	
+
+	if event.keycode == KEY_TAB:
+		confirm_or_cycle_hint()
+		get_viewport().set_input_as_handled()
+		return
+
+	if event.keycode == KEY_RIGHT and hint_active and not hint_confirmed:
+		accept_hint(str(hint_matches[hint_index]))
+		get_viewport().set_input_as_handled()
+		return
+
 	if event.keycode == KEY_DOWN and hint_active:
 		confirm_or_cycle_hint()
 		get_viewport().set_input_as_handled()
 		return
-	
+
 	match event.keycode:
 		KEY_UP:
 			if input_history.is_empty():
@@ -207,16 +194,23 @@ func _input(event: InputEvent) -> void:
 			if history_index == input_history.size():
 				draft_input = line.text
 
-			history_index = posmod(history_index - 1, input_history.size())
-			set_history_input(input_history[history_index])
+			history_index = maxi(history_index - 1, 0)
+			line.text = input_history[history_index]
+			line.caret_column = line.text.length()
 			get_viewport().set_input_as_handled()
 
 		KEY_DOWN:
-			if input_history.is_empty():
+			if history_index >= input_history.size():
 				return
 
-			history_index = (history_index + 1) % input_history.size()
-			set_history_input(input_history[history_index])
+			history_index += 1
+
+			if history_index == input_history.size():
+				line.text = draft_input
+			else:
+				line.text = input_history[history_index]
+
+			line.caret_column = line.text.length()
 			get_viewport().set_input_as_handled()
 
 func send(text: String) -> void:
@@ -448,16 +442,25 @@ func confirm_or_cycle_hint() -> bool:
 	else:
 		hint_confirmed = true
 
-	setting_hint = true
-
-	line.text = str(hint_matches[hint_index]) + " "
-	line.deselect()
-	line.caret_column = line.text.length()
-
-	setting_hint = false
+	var completion: String = str(hint_matches[hint_index])
+	accept_hint(completion)
 
 	return true
 
+func accept_hint(completion: String) -> void:
+	if Commands.has_arguments(StringName(completion)):
+		completion += " "
+	elif ConVars.exists(StringName(completion)):
+		completion += " "
+
+	setting_hint = true
+
+	line.text = completion
+	line.deselect()
+	line.caret_column = completion.length()
+
+	setting_hint = false
+	reset_hints()
 
 func reset_hints() -> void:
 	hint_matches.clear()

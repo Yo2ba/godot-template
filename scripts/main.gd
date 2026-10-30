@@ -1,20 +1,24 @@
 extends Node
 
-@onready var button: Button = $CenterContainer/Button
+@onready var texture_button: TextureButton = $Control/MarginContainer/TextureButton
+@onready var wallpaper: TextureRect = $Control/wallpaper
+
+var wallpapers: Array[String] = [
+	"uid://ye55rabwvoqt",
+	"uid://v42ld74ohev6",
+	"uid://ihwdsujmcke5",
+	"uid://dc5vrg76ov3xe",
+	"uid://cgbq72f2frgqx"
+]
 
 func _ready() -> void:
+	texture_button.pressed.connect(change_wallpaper)
 	initial_messages()
-	button.pressed.connect(func():
-		Utils.prompt(
-			func(): Commands.execute(&"quit"),
-			"Quit",
-			"Are you sure you want to quit?",
-			"Quit",
-			"Return",
-			true
-		)
-		
-	)
+
+func change_wallpaper() -> void:
+	var current = wallpapers.pop_front()
+	wallpaper.texture = load(current)
+	wallpapers.append(current)
 
 func initial_messages() -> void:
 	Console.color(Color.AQUA)

@@ -47,6 +47,24 @@ corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_egmcf"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
+bg_color = Color(0.22352941, 0.24313726, 0.27450982, 1)
+
+[sub_resource type="GDScript" id="GDScript_g4cmj"]
+script/source = "extends ItemList
+
+const LINE_HEIGHT: int = 26
+const MAX_HEIGHT: int = 178
+
+func _ready() -> void:
+	resize()
+
+func resize() -> void:
+	var count: int = get_item_count() 
+	size.y = 0 if count == 0 else clampi(LINE_HEIGHT * count + count, LINE_HEIGHT, MAX_HEIGHT)
+	
+"
+
 [node name="ConsoleMenu" type="Control" unique_id=407086451 node_paths=PackedStringArray("window", "output", "line", "close_btn", "title_grabber", "handle_btn")]
 layout_mode = 3
 anchors_preset = 15
@@ -145,13 +163,14 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_ev3qo")
 bbcode_enabled = true
 scroll_following = true
 autowrap_mode = 0
-context_menu_enabled = true
 selection_enabled = true
 drag_and_drop_selection_enabled = false
 
 [node name="Line" type="LineEdit" parent="Window/VBoxContainer/BodySections/VBoxContainer" unique_id=1418277443]
 layout_mode = 2
 focus_mode = 1
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/selection_color = Color(0.3254902, 0.3372549, 0.3764706, 1)
 theme_override_fonts/font = ExtResource("2_tok2f")
 theme_override_styles/normal = SubResource("StyleBoxFlat_ev3qo")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_egmcf")
@@ -159,6 +178,25 @@ keep_editing_on_text_submit = true
 caret_blink = true
 caret_blink_interval = 0.5
 right_icon = ExtResource("6_d5qkd")
+
+[node name="ItemList" type="ItemList" parent="Window/VBoxContainer/BodySections/VBoxContainer/Line" unique_id=138305594]
+custom_minimum_size = Vector2(512, 0)
+layout_mode = 0
+offset_top = 34.0
+offset_right = 96.0
+offset_bottom = 114.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
+item_count = 9
+item_0/text = "2eqweqwe"
+item_1/text = "123213"
+item_2/text = "rewr"
+item_3/text = "fdsfs"
+item_4/text = "sdfsdfds"
+item_5/text = "fsdfs"
+item_6/text = "sdfsfds"
+item_7/text = "fsdfsf"
+item_8/text = "fsdfsfds"
+script = SubResource("GDScript_g4cmj")
 
 [node name="Handle" type="MarginContainer" parent="Window" unique_id=1503330386]
 layout_mode = 2

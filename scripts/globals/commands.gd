@@ -59,3 +59,10 @@ func get_description(name: StringName) -> String:
 		return ""
 
 	return registry[name]["description"]
+
+func has_arguments(name: StringName) -> bool:
+	if not registry.has(name):
+		return false
+
+	var callback: Callable = registry[name]["callback"]
+	return callback.get_argument_count() > 0
