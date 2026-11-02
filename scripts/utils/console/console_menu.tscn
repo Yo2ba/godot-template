@@ -64,23 +64,28 @@ script/source = "extends ItemList
 const LINE_HEIGHT: int = 23
 const MAX_HEIGHT: int = 178
 
+
 func _ready() -> void:
 	resize()
 
+
 func resize() -> void:
-	var count: int = get_item_count() 
+	var count: int = get_item_count()
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if count == 0 else Control.MOUSE_FILTER_STOP
 	size.y = 0 if count == 0 else clampi(LINE_HEIGHT * count + count, LINE_HEIGHT, MAX_HEIGHT)
-	
+
 	update_position()
-	
+
+
 func update_position() -> void:
-	var window_height: float = get_viewport().get_visible_rect().size.y
-	#var window_height: float = get_viewport_rect().size.y
+	if not is_inside_tree():
+		return
+
+	var window_height: float = get_viewport_rect().size.y
 	if marker_bottom.global_position.y + size.y >= window_height:
 		position.y = marker_top.position.y - size.y
 	else:
 		position.y = marker_bottom.position.y
-	
 "
 
 [node name="ConsoleMenu" type="Control" unique_id=407086451 node_paths=PackedStringArray("window", "output", "line", "close_btn", "title_grabber", "handle_btn", "hint_list")]

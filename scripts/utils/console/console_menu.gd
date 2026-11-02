@@ -1,4 +1,3 @@
-
 extends Control
 @warning_ignore_start("shadowed_variable_base_class")
 
@@ -10,14 +9,14 @@ extends Control
 @export var handle_btn: TextureButton
 @export var hint_list: ItemList
 
+const MIN_WINDOW_SIZE: Vector2 = Vector2(300.0, 300.0)
+
 var input_history: Array[String] = []
 var history_index: int = 0
 var draft_input: String = ""
 
 var dragging: bool = false
 var drag_offset: Vector2 = Vector2.ZERO
-
-const MIN_WINDOW_SIZE: Vector2 = Vector2(300.0, 300.0)
 
 var resizing: bool = false
 var resize_start_mouse: Vector2 = Vector2.ZERO
@@ -26,10 +25,16 @@ var resize_start_size: Vector2 = Vector2.ZERO
 var hint_matches: Array[StringName] = []
 var hint_prefix: String = ""
 var hint_index: int = -1
+var hint_list_index: int = -1
 var hint_active: bool = false
 var hint_confirmed: bool = false
 var setting_hint: bool = false
 var hint_blocked: bool = false
+
+var selection_start: int = -1
+var selection_end: int = -1
+var selection_text: String = ""
+var selection_pending: bool = false
 
 
 func _ready() -> void:
@@ -40,17 +45,19 @@ func _ready() -> void:
 
 	line.text_changed.connect(_on_line_text_changed)
 	line.text_submitted.connect(send)
+	line.focus_exited.connect(_on_line_focus_exited)
+	line.gui_input.connect(_on_line_gui_input)
+	line.deselect_on_focus_loss_enabled = false
 
 	hint_list.item_clicked.connect(_on_hint_list_item_clicked)
 
 	close_btn.pressed.connect(func(): Console.toggle_console())
-	visibility_changed.connect(func(): if visible: line.grab_focus() else: line.release_focus())
+	visibility_changed.connect(_on_visibility_changed)
 
 	window.position = Settings.console_position
 	window.size = Settings.console_size
 
 	Console.console_menu = self
-
 	history_index = input_history.size()
 
 
@@ -61,6 +68,48 @@ func register_commands() -> void:
 	Commands.register(&"quit", func(): get_tree().quit(), "Quit the game")
 	Commands.register(&"help", help, "Shows command descriptions")
 
+
+# --- Helpers for Shared State & Registered Names ---
+
+func get_all_registered_names(case_insensitive_sort: bool = true) -> Array[StringName]:
+	var names: Array[StringName] = Commands.get_all_names()
+
+	for entry: StringName in ConVars.get_all_names():
+		if not names.has(entry):
+			names.append(entry)
+
+	if case_insensitive_sort:
+		names.sort_custom(func(a: StringName, b: StringName) -> bool:
+			return str(a).to_lower() < str(b).to_lower()
+		)
+	else:
+		names.sort()
+
+	return names
+
+
+func set_line_text_silent(new_text: String, select_from: int = -1) -> void:
+	setting_hint = true
+	line.text = new_text
+
+	if select_from >= 0:
+		line.caret_column = select_from
+		line.select(select_from, new_text.length())
+	else:
+		line.deselect()
+		line.caret_column = new_text.length()
+
+	setting_hint = false
+
+
+func clear_selection_state() -> void:
+	selection_pending = false
+	selection_start = -1
+	selection_end = -1
+	selection_text = ""
+
+
+# --- Built-in Console Commands ---
 
 func help(name: String = "") -> void:
 	if not name.is_empty():
@@ -74,17 +123,7 @@ func help(name: String = "") -> void:
 			Console.log("[Console]", "help: no cvar or command named %s" % name)
 		return
 
-	var names: Array[StringName] = Commands.get_all_names()
-
-	for entry: StringName in ConVars.get_all_names():
-		if not names.has(entry):
-			names.append(entry)
-
-	names.sort_custom(func(a: StringName, b: StringName) -> bool:
-		return str(a).to_lower() < str(b).to_lower()
-	)
-
-	for entry: StringName in names:
+	for entry: StringName in get_all_registered_names(true):
 		var description: String = ""
 
 		if Commands.exists(entry):
@@ -94,117 +133,213 @@ func help(name: String = "") -> void:
 
 		Console.log("[Console]", "%s - %s" % [entry, description])
 
+
+func clear() -> void:
+	Console.history = ""
+	output.text = ""
+
+
+func echo(text: String = "") -> void:
+	Console.log("[Console]", text)
+
+
+func savelog() -> void:
+	var now: Dictionary = Time.get_datetime_dict_from_system()
+	var path: String = "user://console_%04d-%02d-%02d_%02d-%02d-%02d.log" % [
+		now["year"], now["month"], now["day"],
+		now["hour"], now["minute"], now["second"]
+	]
+
+	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		Console.log("Failed to save log: " + str(FileAccess.get_open_error()))
+		return
+
+	file.store_string(Console.history)
+	file.close()
+	Console.log("Log saved: %s" % path)
+
+
+func escape(text: String) -> String:
+	return text.replace("[", "[lb]")
+
+
+func add_visible(message: String, color: Color = Color.WHITE) -> void:
+	output.append_text("[color=#%s]%s[/color]\n" % [color.to_html(false), escape(message)])
+
+
+# --- Input Handling ---
+
 func _input(event: InputEvent) -> void:
 	if not visible:
 		return
 
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		var mouse_position: Vector2 = get_global_mouse_position()
+		_handle_mouse_button(event)
+		return
 
-		if event.pressed:
-			if handle_btn.get_global_rect().has_point(mouse_position):
-				resizing = true
-				resize_start_mouse = mouse_position
-				resize_start_size = window.size
-
-			elif title_grabber.get_global_rect().has_point(mouse_position):
-				dragging = true
-				drag_offset = window.global_position - mouse_position
-
-		else:
-			if dragging:
-				dragging = false
-				Settings.console_position = window.position
-
-			if resizing:
-				resizing = false
-				Settings.console_size = window.size
-
-	elif event is InputEventMouseMotion:
-		if resizing:
-			var screen_size: Vector2 = get_viewport_rect().size
-			var available_size: Vector2 = screen_size - window.global_position
-			var mouse_delta: Vector2 = get_global_mouse_position() - resize_start_mouse
-			var new_size: Vector2 = resize_start_size + mouse_delta
-
-			var min_size: Vector2 = Vector2(
-				minf(MIN_WINDOW_SIZE.x, available_size.x),
-				minf(MIN_WINDOW_SIZE.y, available_size.y)
-			)
-
-			new_size.x = clampf(new_size.x, min_size.x, available_size.x)
-			new_size.y = clampf(new_size.y, min_size.y, available_size.y)
-
-			window.size = new_size
-			hint_list.update_position()
-
-		elif dragging:
-			var screen_size: Vector2 = get_viewport_rect().size
-			var window_size: Vector2 = window.size
-			var max_position: Vector2 = screen_size - window_size
-			var new_position: Vector2 = get_global_mouse_position() + drag_offset
-
-			new_position.x = clampf(new_position.x, 0.0, max_position.x)
-			new_position.y = clampf(new_position.y, 0.0, max_position.y)
-
-			window.global_position = new_position
-			hint_list.update_position()
+	if event is InputEventMouseMotion:
+		_handle_mouse_motion()
+		return
 
 	if event is InputEventKey and event.pressed and not event.echo:
-		if line.has_focus():
-			if event.keycode == KEY_BACKSPACE:
-				hint_blocked = true
-				reset_hints()
-			elif event.unicode > 0:
-				hint_blocked = false
+		_handle_key_input(event)
 
-		if event.keycode == KEY_ESCAPE:
-			hide()
-			get_viewport().set_input_as_handled()
-			return
 
-		if event.keycode == KEY_C and event.ctrl_pressed:
-			var selected_text: String = output.get_selected_text()
-			
-			if not selected_text.is_empty():
-				DisplayServer.clipboard_set(selected_text)
-				get_viewport().set_input_as_handled()
-				return
+func _handle_mouse_button(event: InputEventMouseButton) -> void:
+	var mouse_pos: Vector2 = get_global_mouse_position()
 
-	if not line.has_focus():
-		return
+	if event.pressed:
+		if handle_btn.get_global_rect().has_point(mouse_pos):
+			resizing = true
+			resize_start_mouse = mouse_pos
+			resize_start_size = window.size
+		elif title_grabber.get_global_rect().has_point(mouse_pos):
+			dragging = true
+			drag_offset = window.global_position - mouse_pos
+	else:
+		if dragging:
+			dragging = false
+			Settings.console_position = window.position
+		if resizing:
+			resizing = false
+			Settings.console_size = window.size
 
-	if event is not InputEventKey or not event.pressed or event.echo:
-		return
 
-	if event.keycode == KEY_TAB:
-		if confirm_or_cycle_hint():
-			get_viewport().set_input_as_handled()
-		return
+func _handle_mouse_motion() -> void:
+	var screen_size: Vector2 = get_viewport_rect().size
 
-	if event.keycode == KEY_RIGHT and hint_active and hint_index >= 0:
-		accept_hint(str(hint_matches[hint_index]))
+	if resizing:
+		var available_size: Vector2 = screen_size - window.global_position
+		var mouse_delta: Vector2 = get_global_mouse_position() - resize_start_mouse
+		var min_size: Vector2 = MIN_WINDOW_SIZE.min(available_size)
+
+		window.size = (resize_start_size + mouse_delta).clamp(min_size, available_size)
+		hint_list.update_position()
+
+	elif dragging:
+		var max_pos: Vector2 = screen_size - window.size
+		var new_pos: Vector2 = get_global_mouse_position() + drag_offset
+
+		window.global_position = new_pos.clamp(Vector2.ZERO, max_pos)
+		hint_list.update_position()
+
+
+func _handle_key_input(event: InputEventKey) -> void:
+	var has_line_focus: bool = line.has_focus()
+
+	if has_line_focus:
+		if event.keycode == KEY_BACKSPACE:
+			hint_blocked = true
+			reset_hints()
+		elif event.unicode > 0:
+			hint_blocked = false
+
+	if event.keycode == KEY_ESCAPE:
+		hide()
 		get_viewport().set_input_as_handled()
 		return
 
+	if event.keycode == KEY_C and event.ctrl_pressed:
+		var selected_text: String = output.get_selected_text()
+		if not selected_text.is_empty():
+			DisplayServer.clipboard_set(selected_text)
+			get_viewport().set_input_as_handled()
+			return
+
+	if not has_line_focus:
+		return
+
 	match event.keycode:
-		KEY_UP:
-			navigate_history(-1)
+		KEY_TAB:
+			if confirm_or_cycle_hint():
+				get_viewport().set_input_as_handled()
+		KEY_RIGHT:
+			if hint_active and hint_index >= 0:
+				accept_hint(str(hint_matches[hint_index]))
+				get_viewport().set_input_as_handled()
+		KEY_UP, KEY_DOWN:
+			var direction: int = -1 if event.keycode == KEY_UP else 1
+			if hint_list.size.y > 0 and hint_list.get_item_count() > 0:
+				navigate_hint_list(direction)
+			else:
+				navigate_history(direction)
 			get_viewport().set_input_as_handled()
 
-		KEY_DOWN:
-			navigate_history(1)
+
+func _on_line_gui_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_BACKSPACE and selection_pending and selection_start == selection_end:
+			clear_selection_state()
 			get_viewport().set_input_as_handled()
+
+
+# --- Focus & Selection Persistence ---
+
+func remember_line_selection() -> void:
+	if not line.has_selection():
+		clear_selection_state()
+		return
+
+	selection_start = line.get_selection_from_column()
+	selection_end = line.get_selection_to_column()
+	selection_text = line.text
+	selection_pending = true
+
+
+func restore_hint_selection() -> void:
+	if not selection_pending:
+		return
+
+	if line.text != selection_text or selection_start < 0 or selection_end > line.text.length():
+		selection_pending = false
+		return
+
+	line.select(selection_start, selection_end)
+
+
+func _on_line_focus_exited() -> void:
+	if not is_inside_tree():
+		return
+
+	remember_line_selection()
+	hint_list.resize()
+	line.deselect()
+
+
+func _on_visibility_changed() -> void:
+	if visible:
+		line.grab_focus()
+		restore_hint_selection()
+	else:
+		if line.has_focus():
+			line.release_focus()
+		else:
+			hint_list.resize()
+
+
+# --- History & Hint Navigation ---
+
+func navigate_hint_list(direction: int) -> void:
+	var count: int = hint_list.get_item_count()
+	if count == 0:
+		return
+
+	if hint_list_index == -1:
+		hint_list_index = count - 1 if direction < 0 else 0
+	else:
+		hint_list_index = posmod(hint_list_index + direction, count)
+
+	hint_list.deselect_all()
+	hint_list.select(hint_list_index)
+	hint_list.ensure_current_is_visible()
+
+	set_line_text_silent(hint_list.get_item_text(hint_list_index))
 
 
 func navigate_history(direction: int) -> void:
-	var max_index: int = input_history.size() + hint_matches.size()
-
-	var new_index: int = clampi(
-		history_index + direction,
-		0,
-		max_index
-	)
+	var max_index: int = input_history.size() + hint_list.get_item_count()
+	var new_index: int = clampi(history_index + direction, 0, max_index)
 
 	if new_index == history_index:
 		return
@@ -212,40 +347,143 @@ func navigate_history(direction: int) -> void:
 	history_index = new_index
 
 	var text: String
-
 	if history_index < input_history.size():
 		text = input_history[history_index]
-
 	elif history_index == input_history.size():
 		text = draft_input
-
 	else:
 		var index: int = history_index - input_history.size() - 1
 		text = hint_list.get_item_text(index)
 
-	setting_hint = true
+	set_line_text_silent(text)
 
-	line.text = text
-	line.deselect()
-	line.caret_column = line.text.length()
 
-	setting_hint = false
+func _on_line_text_changed(text: String) -> void:
+	if setting_hint:
+		return
 
+	clear_selection_state()
+	reset_hints()
+
+	history_index = input_history.size()
+	draft_input = text
+
+	if not line.has_focus() or hint_blocked or text.is_empty() or text.contains(" "):
+		return
+
+	hint_prefix = text.to_lower()
+	update_hint_list(hint_prefix)
+
+	for name: StringName in get_all_registered_names(false):
+		if str(name).begins_with(hint_prefix):
+			hint_matches.append(name)
+
+	hint_active = not hint_matches.is_empty()
+	if hint_active:
+		hint_index = 0
+		set_hint(str(hint_matches[hint_index]), text.length())
+
+
+func update_hint_list(query: String) -> void:
+	hint_list.clear()
+	hint_list_index = -1
+
+	var names: Array[StringName] = get_all_registered_names(true)
+	var substring_matches: Array[StringName] = []
+
+	for name: StringName in names:
+		var normalized: String = str(name).to_lower()
+		if normalized.begins_with(query):
+			add_hint_item(name)
+		elif normalized.contains(query):
+			substring_matches.append(name)
+
+	for name: StringName in substring_matches:
+		add_hint_item(name)
+
+	hint_list.resize()
+	hint_list.update_position()
+
+
+func add_hint_item(name: StringName) -> void:
+	var hint: String = str(name)
+	if ConVars.exists(name):
+		hint += " " + str(ConVars.get_value(name))
+	hint_list.add_item(hint)
+
+
+func _on_hint_list_item_clicked(index: int, _at_position: Vector2, _mouse_button_index: int) -> void:
+	set_history_input(hint_list.get_item_text(index))
+
+
+func set_hint(completion: String, caret_position: int) -> void:
+	set_line_text_silent(completion, caret_position)
+
+	selection_start = caret_position
+	selection_end = completion.length()
+	selection_text = completion
+	selection_pending = true
+
+
+func confirm_or_cycle_hint() -> bool:
+	if not hint_active or hint_matches.is_empty():
+		return false
+
+	if not hint_confirmed:
+		hint_confirmed = true
+	else:
+		hint_index = (hint_index + 1) % hint_matches.size()
+
+	clear_selection_state()
+	history_index = input_history.size() + 1 + hint_index
+
+	var completion: String = str(hint_matches[hint_index])
+	if ConVars.exists(StringName(completion)):
+		completion += " "
+
+	set_line_text_silent(completion)
+	return true
+
+
+func accept_hint(completion: String) -> void:
+	var key: StringName = StringName(completion)
+	if Commands.has_arguments(key) or ConVars.exists(key):
+		completion += " "
+
+	set_history_input(completion)
+
+
+func reset_hints() -> void:
+	hint_matches.clear()
+	hint_prefix = ""
+	hint_index = -1
+	hint_list_index = -1
+	hint_active = false
+	hint_confirmed = false
+
+	hint_list.clear()
+	hint_list.resize()
+
+
+func set_history_input(text: String) -> void:
+	reset_hints()
+	set_line_text_silent(text)
+	draft_input = text
+	history_index = input_history.size()
+
+
+# --- Command Execution & Parsing ---
 
 func send(text: String) -> void:
 	var input: String = text.strip_edges()
-
 	if input.is_empty():
 		return
 
 	var parts: PackedStringArray = parse_arguments(input)
-
 	if parts.is_empty():
 		return
 
-	if input in input_history:
-		input_history.erase(input)
-
+	input_history.erase(input)
 	input_history.append(input)
 	history_index = input_history.size()
 	draft_input = ""
@@ -258,12 +496,8 @@ func send(text: String) -> void:
 
 	Console.log("> " + input, Color.GRAY)
 
-	var args: Array = []
-
-	for i in range(1, parts.size()):
-		args.append(parts[i])
-
 	if Commands.exists(lookup_name):
+		var args: Array = Array(parts.slice(1))
 		Commands.execute(lookup_name, args)
 		return
 
@@ -273,8 +507,7 @@ func send(text: String) -> void:
 
 	if parts.size() == 1:
 		var display_value: Variant = ConVars.get_value(lookup_name)
-
-		if display_value is float and display_value == float(int(display_value)):
+		if display_value is float and is_equal_approx(display_value, int(display_value)):
 			display_value = int(display_value)
 
 		Console.log("[Console]", "%s = %s" % [name, display_value])
@@ -287,7 +520,6 @@ func send(text: String) -> void:
 	match typeof(current_value):
 		TYPE_BOOL:
 			var normalized: String = value_text.to_lower()
-
 			if normalized == "true":
 				value = true
 			elif normalized == "false":
@@ -298,19 +530,12 @@ func send(text: String) -> void:
 				Console.log("Expected a boolean or integer value.", Color.RED)
 				return
 
-		TYPE_INT:
+		TYPE_INT, TYPE_FLOAT:
 			if not value_text.is_valid_float():
 				Console.log("Expected a numeric value.", Color.RED)
 				return
-
-			value = int(value_text.to_float())
-
-		TYPE_FLOAT:
-			if not value_text.is_valid_float():
-				Console.log("Expected a numeric value.", Color.RED)
-				return
-
-			value = value_text.to_float()
+			@warning_ignore("incompatible_ternary")
+			value = int(value_text.to_float()) if typeof(current_value) == TYPE_INT else value_text.to_float()
 
 		TYPE_STRING:
 			value = value_text
@@ -320,52 +545,6 @@ func send(text: String) -> void:
 			return
 
 	ConVars.set_value(lookup_name, value)
-
-
-func escape(text: String) -> String:
-	return text.replace("[", "[lb]")
-
-
-func clear() -> void:
-	Console.history = ""
-	output.text = ""
-
-
-func echo(text: String = "") -> void:
-	Console.log("[Console]", text)
-
-
-func add_visible(message: String, color: Color = Color.WHITE) -> void:
-	output.append_text(
-		"[color=#%s]%s[/color]\n" % [
-			color.to_html(false),
-			escape(message)
-		]
-	)
-
-
-func savelog() -> void:
-	var now: Dictionary = Time.get_datetime_dict_from_system()
-
-	var path: String = "user://console_%04d-%02d-%02d_%02d-%02d-%02d.log" % [
-		now["year"],
-		now["month"],
-		now["day"],
-		now["hour"],
-		now["minute"],
-		now["second"]
-	]
-
-	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
-
-	if file == null:
-		Console.log("Failed to save log: " + str(FileAccess.get_open_error()))
-		return
-
-	file.store_string(Console.history)
-	file.close()
-
-	Console.log("Log saved: %s" % path)
 
 
 func parse_arguments(input: String) -> PackedStringArray:
@@ -414,154 +593,3 @@ func parse_arguments(input: String) -> PackedStringArray:
 		args.append(current)
 
 	return args
-
-
-func _on_line_text_changed(text: String) -> void:
-	if setting_hint:
-		return
-
-	reset_hints()
-
-	history_index = input_history.size()
-	draft_input = text
-
-	if hint_blocked or text.is_empty() or text.contains(" "):
-		return
-
-	hint_prefix = text.to_lower()
-
-	var names: Array[StringName] = Commands.get_all_names()
-
-	for name: StringName in ConVars.get_all_names():
-		if not names.has(name):
-			names.append(name)
-
-	names.sort()
-
-	for name: StringName in names:
-		if str(name).begins_with(hint_prefix):
-			hint_matches.append(name)
-
-	hint_active = not hint_matches.is_empty()
-
-	if hint_active:	
-		hint_index = 0
-		set_hint(str(hint_matches[hint_index]), text.length())
-
-	update_hint_list()
-
-func update_hint_list() -> void:
-	hint_list.clear()
-
-	for name: StringName in hint_matches:
-		if ConVars.exists(name):
-			var value: Variant = ConVars.get_value(name)
-			var display_value: String = str(value)
-
-			if value is float and is_equal_approx(value, roundf(value)):
-				display_value = str(roundi(value))
-
-			hint_list.add_item("%s %s" % [name, display_value])
-		else:
-			hint_list.add_item(str(name))
-
-	hint_list.resize()
-	hint_list.update_position()
-
-	if hint_matches.is_empty():
-		hint_list.hide()
-	else:
-		hint_list.show()
-
-func _on_hint_list_item_clicked(index: int, _at_position: Vector2, _mouse_button_index: int) -> void:
-	var completion: String = hint_list.get_item_text(index)
-
-	reset_hints()
-
-	setting_hint = true
-	line.text = completion
-	line.deselect()
-	line.caret_column = completion.length()
-	setting_hint = false
-
-	draft_input = completion
-	history_index = input_history.size()
-
-func set_hint(completion: String, selection_start: int) -> void:
-	setting_hint = true
-
-	line.text = completion
-	line.caret_column = selection_start
-	line.select(selection_start, completion.length())
-
-	setting_hint = false
-
-
-func confirm_or_cycle_hint() -> bool:
-	if not hint_active or hint_matches.is_empty():
-		return false
-
-	if not hint_confirmed:
-		hint_confirmed = true
-	else:
-		hint_index = (hint_index + 1) % hint_matches.size()
-
-	history_index = input_history.size() + 1 + hint_index
-
-	var completion: String = str(hint_matches[hint_index])
-
-	if ConVars.exists(StringName(completion)):
-		completion += " "
-
-	setting_hint = true
-	line.text = completion
-	line.deselect()
-	line.caret_column = completion.length()
-	setting_hint = false
-
-	return true
-
-func accept_hint(completion: String) -> void:
-	if Commands.has_arguments(StringName(completion)):
-		completion += " "
-	elif ConVars.exists(StringName(completion)):
-		completion += " "
-
-	setting_hint = true
-
-	line.text = completion
-	line.deselect()
-	line.caret_column = completion.length()
-
-	setting_hint = false
-
-	draft_input = completion
-	history_index = input_history.size()
-
-	reset_hints()
-
-
-func reset_hints() -> void:
-	hint_matches.clear()
-	hint_prefix = ""
-	hint_index = -1
-	hint_active = false
-	hint_confirmed = false
-
-	hint_list.clear()
-	hint_list.hide()
-
-
-func set_history_input(text: String) -> void:
-	reset_hints()
-
-	setting_hint = true
-
-	line.text = text
-	line.deselect()
-	line.caret_column = line.text.length()
-
-	setting_hint = false
-
-	draft_input = text
-	history_index = input_history.size()
