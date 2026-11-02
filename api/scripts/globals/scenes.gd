@@ -13,7 +13,7 @@ extends Node
 signal scene_load_progress(progress: float)
 signal scene_load_finished(success: bool)
 
-const LOADING_SCREEN_PATH: String = "res://scripts/utils/loading_screen/loading_screen.tscn"
+const LOADING_SCREEN_PATH: String = "res://api/scripts/utils/loading_screen/loading_screen.tscn"
 
 var loading_screen: CanvasLayer
 var loaded_scene: PackedScene

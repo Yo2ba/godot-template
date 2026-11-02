@@ -17,6 +17,8 @@ var draft_input: String = ""
 
 var dragging: bool = false
 var drag_offset: Vector2 = Vector2.ZERO
+var drag_start_mouse: Vector2 = Vector2.ZERO
+var has_dragged: bool = false
 
 var resizing: bool = false
 var resize_start_mouse: Vector2 = Vector2.ZERO
@@ -53,7 +55,7 @@ func _ready() -> void:
 
 	hint_list.item_clicked.connect(_on_hint_list_item_clicked)
 
-	close_btn.pressed.connect(Console.toggle_console)
+	close_btn.pressed.connect(_on_close_btn_pressed)
 	visibility_changed.connect(_on_visibility_changed)
 
 	window.position = Settings.console_position
@@ -62,6 +64,9 @@ func _ready() -> void:
 	Console.console_menu = self
 	history_index = input_history.size()
 
+func _on_close_btn_pressed() -> void:
+	if not has_dragged:
+		Console.toggle_console()
 
 func register_commands() -> void:
 	Console.register_command(&"clear", clear, "Clears the console log")
@@ -120,11 +125,14 @@ func echo(text: String = "") -> void:
 
 func savelog() -> void:
 	var now: Dictionary = Time.get_datetime_dict_from_system()
-	var path: String = "user://console_%04d-%02d-%02d_%02d-%02d-%02d.log" % [
+	var filename: String = "console_%04d-%02d-%02d_%02d-%02d-%02d.log" % [
 		now["year"], now["month"], now["day"],
 		now["hour"], now["minute"], now["second"]
 	]
-
+	var path: String = "user://" + filename
+	var separator: String = "\\" if OS.get_name() == "Windows" else "/"
+	var display_path: String = OS.get_environment("APPDATA") + separator + "Template" + separator + filename
+	
 	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
 	if file == null:
 		Console.log("Failed to save log: " + str(FileAccess.get_open_error()))
@@ -132,7 +140,7 @@ func savelog() -> void:
 
 	file.store_string("\n".join(Console.history) + "\n")
 	file.close()
-	Console.log("Log saved: %s" % path)
+	Console.log("Log saved: %s" % display_path)
 
 
 func add_visible(message: String, color: Color = Color.WHITE) -> void:
@@ -152,7 +160,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_handle_mouse_button(event)
 		return
-
+	
 	if event is InputEventKey and event.pressed:
 		_handle_key_input(event)
 
@@ -161,13 +169,17 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 	var mouse_pos: Vector2 = get_global_mouse_position()
 
 	if event.pressed:
+		has_dragged = false
 		if handle_btn.get_global_rect().has_point(mouse_pos):
 			resizing = true
 			resize_start_mouse = mouse_pos
 			resize_start_size = window.size
 		elif title_grabber.get_global_rect().has_point(mouse_pos):
 			dragging = true
+			drag_start_mouse = mouse_pos
 			drag_offset = window.global_position - mouse_pos
+			if line.has_focus():
+				line.release_focus()
 	else:
 		if dragging:
 			dragging = false
@@ -178,9 +190,9 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 
 
 func _handle_mouse_motion() -> void:
-	var screen_size: Vector2 = get_viewport_rect().size
-
 	if resizing:
+		has_dragged = true
+		var screen_size: Vector2 = get_viewport_rect().size
 		var available_size: Vector2 = screen_size - window.global_position
 		var mouse_delta: Vector2 = get_global_mouse_position() - resize_start_mouse
 		var min_size: Vector2 = MIN_WINDOW_SIZE.min(available_size)
@@ -189,12 +201,12 @@ func _handle_mouse_motion() -> void:
 		hint_list.update_position()
 
 	elif dragging:
-		var max_pos: Vector2 = screen_size - window.size
-		var new_pos: Vector2 = get_global_mouse_position() + drag_offset
-
-		window.global_position = new_pos.clamp(Vector2.ZERO, max_pos)
+		var current_pos: Vector2 = get_global_mouse_position()
+		if current_pos.distance_to(drag_start_mouse) > 4.0:
+			has_dragged = true
+			
+		window.global_position = current_pos + drag_offset
 		hint_list.update_position()
-
 
 func _handle_key_input(event: InputEventKey) -> void:
 	var has_line_focus: bool = line.has_focus()

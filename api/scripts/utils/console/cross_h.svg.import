@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bdf35gpf2reny"
-path="res://.godot/imported/handle_p.svg-9dd6bf6a942ada8f00a4b41e47fad89f.ctex"
+uid="uid://dmepg4r1kfmti"
+path="res://.godot/imported/cross_h.svg-343912af24617add159d457b31d24555.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://scripts/utils/console/handle_p.svg"
-dest_files=["res://.godot/imported/handle_p.svg-9dd6bf6a942ada8f00a4b41e47fad89f.ctex"]
+source_file="res://api/scripts/utils/console/cross_h.svg"
+dest_files=["res://.godot/imported/cross_h.svg-343912af24617add159d457b31d24555.ctex"]
 
 [params]
 

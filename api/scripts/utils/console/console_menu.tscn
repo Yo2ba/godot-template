@@ -1,16 +1,16 @@
 [gd_scene format=3 uid="uid://nugh2wokqnq3"]
 
-[ext_resource type="Script" uid="uid://clww6upaan6y3" path="res://scripts/utils/console/console_menu.gd" id="1_5wnhe"]
-[ext_resource type="Theme" uid="uid://bln5anbi0dt0n" path="res://utils/api_theme.tres" id="1_ev3qo"]
-[ext_resource type="FontFile" uid="uid://4wkebsccq512" path="res://scripts/utils/console/Stratum2-Bold-700.ttf" id="2_egmcf"]
-[ext_resource type="FontFile" uid="uid://ood63wr07bui" path="res://scripts/utils/console/Stratum2-Mono-Regular-400.ttf" id="2_tok2f"]
-[ext_resource type="Texture2D" uid="uid://cdeoa2y05p1su" path="res://scripts/utils/console/cross_n.svg" id="4_g4cmj"]
-[ext_resource type="Texture2D" uid="uid://cddbfvbjjsbtt" path="res://scripts/utils/console/cross_p.svg" id="5_ew1rg"]
-[ext_resource type="Texture2D" uid="uid://bhnrl0cqanl5s" path="res://scripts/utils/console/arrow.svg" id="6_d5qkd"]
-[ext_resource type="Texture2D" uid="uid://dmepg4r1kfmti" path="res://scripts/utils/console/cross_h.svg" id="6_rokao"]
-[ext_resource type="Texture2D" uid="uid://b1iuv0v8ix8m6" path="res://scripts/utils/console/handle_n.svg" id="7_rnlvh"]
-[ext_resource type="Texture2D" uid="uid://bdf35gpf2reny" path="res://scripts/utils/console/handle_p.svg" id="8_qv6wu"]
-[ext_resource type="Texture2D" uid="uid://cslw1nmeorq1r" path="res://scripts/utils/console/handle_h.svg" id="9_g4cmj"]
+[ext_resource type="Script" uid="uid://clww6upaan6y3" path="res://api/scripts/utils/console/console_menu.gd" id="1_5wnhe"]
+[ext_resource type="Theme" uid="uid://bln5anbi0dt0n" path="res://api/scripts/utils/api_theme.tres" id="1_ev3qo"]
+[ext_resource type="FontFile" uid="uid://4wkebsccq512" path="res://api/scripts/utils/console/Stratum2-Bold-700.ttf" id="2_egmcf"]
+[ext_resource type="FontFile" uid="uid://ood63wr07bui" path="res://api/scripts/utils/console/Stratum2-Mono-Regular-400.ttf" id="2_tok2f"]
+[ext_resource type="Texture2D" uid="uid://cdeoa2y05p1su" path="res://api/scripts/utils/console/cross_n.svg" id="4_g4cmj"]
+[ext_resource type="Texture2D" uid="uid://cddbfvbjjsbtt" path="res://api/scripts/utils/console/cross_p.svg" id="5_ew1rg"]
+[ext_resource type="Texture2D" uid="uid://bhnrl0cqanl5s" path="res://api/scripts/utils/console/arrow.svg" id="6_d5qkd"]
+[ext_resource type="Texture2D" uid="uid://dmepg4r1kfmti" path="res://api/scripts/utils/console/cross_h.svg" id="6_rokao"]
+[ext_resource type="Texture2D" uid="uid://b1iuv0v8ix8m6" path="res://api/scripts/utils/console/handle_n.svg" id="7_rnlvh"]
+[ext_resource type="Texture2D" uid="uid://bdf35gpf2reny" path="res://api/scripts/utils/console/handle_p.svg" id="8_qv6wu"]
+[ext_resource type="Texture2D" uid="uid://cslw1nmeorq1r" path="res://api/scripts/utils/console/handle_h.svg" id="9_g4cmj"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ohn4w"]
 bg_color = Color(0.13333334, 0.15686275, 0.19215687, 1)
@@ -86,6 +86,8 @@ func update_position() -> void:
 		position.y = marker_top.position.y - size.y
 	else:
 		position.y = marker_bottom.position.y
+
+	global_position.y = clampf(global_position.y, 0.0, maxf(0.0, window_height - size.y))
 "
 
 [node name="ConsoleMenu" type="Control" unique_id=407086451 node_paths=PackedStringArray("window", "output", "line", "close_btn", "title_grabber", "handle_btn", "hint_list")]

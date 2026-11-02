@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dxrsku6jfcilv"]
 
-[ext_resource type="FontFile" uid="uid://ood63wr07bui" path="res://scripts/utils/console/Stratum2-Mono-Regular-400.ttf" id="1_g63an"]
+[ext_resource type="FontFile" uid="uid://ood63wr07bui" path="res://api/scripts/utils/console/Stratum2-Mono-Regular-400.ttf" id="1_g63an"]
 
 [node name="DebugMenu" type="CanvasLayer" unique_id=1499456586]
 

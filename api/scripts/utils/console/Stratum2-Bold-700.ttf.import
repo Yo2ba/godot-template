@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://4wkebsccq512"
-path="res://.godot/imported/Stratum2-Bold-700.ttf-2f149885cc985c8cadf7ce5f1ae22741.fontdata"
+path="res://.godot/imported/Stratum2-Bold-700.ttf-ecac0a9f4803db722388cc875350c033.fontdata"
 
 [deps]
 
-source_file="res://scripts/utils/console/Stratum2-Bold-700.ttf"
-dest_files=["res://.godot/imported/Stratum2-Bold-700.ttf-2f149885cc985c8cadf7ce5f1ae22741.fontdata"]
+source_file="res://api/scripts/utils/console/Stratum2-Bold-700.ttf"
+dest_files=["res://.godot/imported/Stratum2-Bold-700.ttf-ecac0a9f4803db722388cc875350c033.fontdata"]
 
 [params]
 

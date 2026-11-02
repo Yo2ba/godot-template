@@ -1,6 +1,6 @@
 extends Node
 
-const PROMPT_SCENE: PackedScene = preload("res://scripts/utils/prompt/prompt.tscn")
+const PROMPT_SCENE: PackedScene = preload("res://api/scripts/utils/prompt/prompt.tscn")
 
 var active_prompt: Prompt
 
