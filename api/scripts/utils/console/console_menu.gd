@@ -130,8 +130,7 @@ func savelog() -> void:
 		now["hour"], now["minute"], now["second"]
 	]
 	var path: String = "user://" + filename
-	var separator: String = "\\" if OS.get_name() == "Windows" else "/"
-	var display_path: String = OS.get_environment("APPDATA") + separator + "Template" + separator + filename
+	var display_path: String = OS.get_user_data_dir() + "/" + filename
 	
 	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
 	if file == null:

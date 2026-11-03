@@ -22,6 +22,7 @@ var is_loading: bool = false
 func _ready() -> void:
 	var loading_screen_scene: PackedScene = load(LOADING_SCREEN_PATH)
 	loading_screen = loading_screen_scene.instantiate() as CanvasLayer
+	loading_screen.layer = 9
 	get_tree().root.add_child.call_deferred(loading_screen)
 	loading_screen.hide()
 
