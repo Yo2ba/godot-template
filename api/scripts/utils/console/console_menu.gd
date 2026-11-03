@@ -526,8 +526,10 @@ func send(text: String) -> void:
 		Console.log("Unknown command: %s" % name)
 		return
 
+	var current_value: Variant = Console.get_convar_value(lookup_name)
+
 	if parts.size() == 1:
-		var display_value: Variant = Console.get_convar_value(lookup_name)
+		var display_value: Variant = current_value
 		if display_value is float and is_equal_approx(display_value, int(display_value)):
 			display_value = int(display_value)
 
@@ -535,38 +537,9 @@ func send(text: String) -> void:
 		return
 
 	var value_text: String = " ".join(parts.slice(1))
-	var current_value: Variant = Console.get_convar_value(lookup_name)
-	var value: Variant
-
-	match typeof(current_value):
-		TYPE_BOOL:
-			var normalized: String = value_text.to_lower()
-			if normalized == "true":
-				value = true
-			elif normalized == "false":
-				value = false
-			elif value_text.is_valid_int():
-				value = value_text.to_int() != 0
-			else:
-				Console.log("Expected a boolean or integer value.", Color.RED)
-				return
-
-		TYPE_INT, TYPE_FLOAT:
-			if not value_text.is_valid_float():
-				Console.log("Expected a numeric value.", Color.RED)
-				return
-			@warning_ignore("incompatible_ternary")
-			value = int(value_text.to_float()) if typeof(current_value) == TYPE_INT else value_text.to_float()
-
-		TYPE_STRING:
-			value = value_text
-
-		_:
-			Console.log("Unsupported ConVar type.", Color.RED)
-			return
-
-	Console.set_convar_value(lookup_name, value)
-
+	var parsed_value: Variant = Console.parse_value(value_text, typeof(current_value))
+	if parsed_value != null:
+		Console.set_convar_value(lookup_name, parsed_value)
 
 func parse_arguments(input: String) -> PackedStringArray:
 	var args: PackedStringArray = []

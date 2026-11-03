@@ -26,13 +26,15 @@ func _ready() -> void:
 	close_btn.pressed.connect(cancel)
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_ESCAPE and not event.is_echo():
-			get_viewport().set_input_as_handled()
-			cancel()
-		elif event.keycode == KEY_ENTER and not event.is_echo():
-			get_viewport().set_input_as_handled()
-			confirm()
+	if event is InputEventKey:
+		get_viewport().set_input_as_handled()
+
+		if event.pressed and not event.is_echo():
+			match event.keycode:
+				KEY_ESCAPE:
+					cancel()
+				KEY_ENTER, KEY_KP_ENTER:
+					confirm()
 
 func setup(
 	prompt_title: String,

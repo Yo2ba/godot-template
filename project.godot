@@ -30,6 +30,7 @@ ThreadedLoader="*uid://bjvuayvaxw5a"
 Utils="*uid://cndoo2or440yj"
 Scenes="*uid://b4s588ny4xgju"
 Settings="*uid://bwnpkh85hvs6p"
+Flags="*uid://bgjgjux375vvi"
 
 [debug]
 
@@ -46,10 +47,7 @@ window/stretch/aspect="expand"
 [file_customization]
 
 folder_colors={
-"res://api/": "red",
-"res://assets/": "orange",
-"res://scenes/": "purple",
-"res://utils/": "pink"
+"res://api/": "red"
 }
 
 [physics]

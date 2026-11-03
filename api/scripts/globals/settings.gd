@@ -11,11 +11,12 @@ var is_loading: bool = false
 
 var fps_max: int:
 	set(value):
-		if value != 0:
-			value = clampi(value, 32, 1000)
 		if fps_max == value:
 			return
-
+			
+		if value != 0:
+			value = maxi(64, value)
+		
 		fps_max = value
 		Engine.max_fps = fps_max
 		if not is_loading:
@@ -69,10 +70,10 @@ var console_size: Vector2 = Vector2(600.0, 400.0):
 
 func _ready() -> void:
 	load_config()
-	Console.register_convar(self, &"fps_max", &"fps_max", TYPE_INT, "Set FPS limit")
-	Console.register_convar(self, &"volume", &"master_volume", TYPE_FLOAT, "Master volume")
-	Console.register_convar(self, &"music", &"music_volume", TYPE_FLOAT, "Music volume")
-	Console.register_convar(self, &"sfx", &"sfx_volume", TYPE_FLOAT, "Sfx volume")
+	Console.register_convar(&"fps_max", &"fps_max", "Set FPS limit")
+	Console.register_convar(&"volume", &"master_volume", "Master volume")
+	Console.register_convar(&"music", &"music_volume", "Music volume")
+	Console.register_convar(&"sfx", &"sfx_volume", "Sfx volume")
 
 
 func _exit_tree() -> void:

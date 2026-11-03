@@ -11,6 +11,7 @@ var wallpapers: Array[String] = [
 	"uid://cgbq72f2frgqx"
 ]
 
+
 func _ready() -> void:
 	texture_button.pressed.connect(change_wallpaper)
 	initial_messages()
