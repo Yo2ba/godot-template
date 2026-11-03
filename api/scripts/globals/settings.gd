@@ -97,8 +97,11 @@ func _ready() -> void:
 	Console.register_convar(&"music", &"music_volume", "Music volume")
 	Console.register_convar(&"sfx", &"sfx_volume", "Sfx volume")
 	
+	var debug_layer: CanvasLayer = CanvasLayer.new()
+	debug_layer.layer = 1
+	get_tree().root.add_child.call_deferred(debug_layer)
 	debug_menu = DEBUG_SCENE.instantiate()
-	get_tree().root.add_child.call_deferred(debug_menu)
+	debug_layer.add_child(debug_menu)
 
 
 func _exit_tree() -> void:

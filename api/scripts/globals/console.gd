@@ -29,8 +29,11 @@ var _names_dirty: bool = false
 
 
 func _ready() -> void:
+	var console_layer: CanvasLayer = CanvasLayer.new()
+	console_layer.layer = 10
+	get_tree().root.add_child.call_deferred(console_layer)
 	console_menu = CONSOLE_SCENE.instantiate()
-	get_tree().root.add_child.call_deferred(console_menu)
+	console_layer.add_child(console_menu)
 
 
 func _input(event: InputEvent) -> void:
