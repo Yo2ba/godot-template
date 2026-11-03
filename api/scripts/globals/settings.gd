@@ -1,9 +1,11 @@
 extends Node
 
 const CONFIG_PATH: String = "user://settings.cfg"
+const DEBUG_SCENE = preload("uid://dxrsku6jfcilv")
 
 var config: ConfigFile = ConfigFile.new()
 var is_loading: bool = false
+var debug_menu: Control
 
 @onready var _bus_master: int = AudioServer.get_bus_index("Master")
 @onready var _bus_music: int = AudioServer.get_bus_index("music")
@@ -21,6 +23,24 @@ var fps_max: int:
 		Engine.max_fps = fps_max
 		if not is_loading:
 			save_setting("fps_max", fps_max)
+
+var showfps: bool:
+	set(value):
+		if showfps == value:
+			return
+		
+		showfps = value
+		if not is_loading:
+			save_setting("showfps", showfps)
+
+var showtick: bool:
+	set(value):
+		if showtick == value:
+			return
+		
+		showtick = value
+		if not is_loading:
+			save_setting("showtick", showtick)
 
 var master_volume: float:
 	set(volume):
@@ -71,9 +91,14 @@ var console_size: Vector2 = Vector2(600.0, 400.0):
 func _ready() -> void:
 	load_config()
 	Console.register_convar(&"fps_max", &"fps_max", "Set FPS limit")
+	Console.register_convar(&"showfps", &"showfps", "Show frames rendering info")
+	Console.register_convar(&"showtick", &"showtick", "Show physics tick info")
 	Console.register_convar(&"volume", &"master_volume", "Master volume")
 	Console.register_convar(&"music", &"music_volume", "Music volume")
 	Console.register_convar(&"sfx", &"sfx_volume", "Sfx volume")
+	
+	debug_menu = DEBUG_SCENE.instantiate()
+	get_tree().root.add_child.call_deferred(debug_menu)
 
 
 func _exit_tree() -> void:
@@ -101,6 +126,8 @@ func load_config() -> void:
 
 	is_loading = true
 	fps_max = config.get_value("settings", "fps_max", 0)
+	showfps = config.get_value("settings", "showfps", false)
+	showtick = config.get_value("settings", "showtick", false)
 	console_position = config.get_value("settings", "console_position", default_pos)
 	console_size = config.get_value("settings", "console_size", Vector2(800.0, 600.0))
 	master_volume = config.get_value("settings", "master_volume", 1.0)
@@ -111,6 +138,8 @@ func load_config() -> void:
 
 func save_config() -> void:
 	config.set_value("settings", "fps_max", fps_max)
+	config.set_value("settings", "showfps", showfps)
+	config.set_value("settings", "showtick", showtick)
 	config.set_value("settings", "console_position", console_position)
 	config.set_value("settings", "console_size", console_size)
 	config.set_value("settings", "master_volume", master_volume)
