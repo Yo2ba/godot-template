@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://b1iuv0v8ix8m6" path="res://api/scripts/utils/console/handle_n.svg" id="7_rnlvh"]
 [ext_resource type="Texture2D" uid="uid://bdf35gpf2reny" path="res://api/scripts/utils/console/handle_p.svg" id="8_qv6wu"]
 [ext_resource type="Texture2D" uid="uid://cslw1nmeorq1r" path="res://api/scripts/utils/console/handle_h.svg" id="9_g4cmj"]
+[ext_resource type="Script" uid="uid://ub0eilwlhevt" path="res://api/scripts/utils/console/hint_list.gd" id="9_ojyn6"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ohn4w"]
 bg_color = Color(0.13333334, 0.15686275, 0.19215687, 1)
@@ -54,41 +55,6 @@ bg_color = Color(0.22352941, 0.24313726, 0.27450982, 1)
 bg_color = Color(0.31679213, 0.3429655, 0.38484284, 1)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hfig2"]
-
-[sub_resource type="GDScript" id="GDScript_g4cmj"]
-script/source = "extends ItemList
-
-@export var marker_top: Control
-@export var marker_bottom: Control
-
-const LINE_HEIGHT: int = 23
-const MAX_HEIGHT: int = 178
-
-
-func _ready() -> void:
-	resize()
-
-
-func resize() -> void:
-	var count: int = get_item_count()
-	mouse_filter = Control.MOUSE_FILTER_IGNORE if count == 0 else Control.MOUSE_FILTER_STOP
-	size.y = 0 if count == 0 else clampi(LINE_HEIGHT * count + count, LINE_HEIGHT, MAX_HEIGHT)
-
-	update_position()
-
-
-func update_position() -> void:
-	if not is_inside_tree():
-		return
-
-	var window_height: float = get_viewport_rect().size.y
-	if marker_bottom.global_position.y + size.y >= window_height:
-		position.y = marker_top.position.y - size.y
-	else:
-		position.y = marker_bottom.position.y
-
-	global_position.y = clampf(global_position.y, 0.0, maxf(0.0, window_height - size.y))
-"
 
 [node name="ConsoleMenu" type="Control" unique_id=407086451 node_paths=PackedStringArray("window", "output", "line", "close_btn", "title_grabber", "handle_btn", "hint_list")]
 layout_mode = 3
@@ -239,7 +205,7 @@ theme_override_styles/hovered_selected = SubResource("StyleBoxFlat_g4cmj")
 theme_override_styles/selected = SubResource("StyleBoxEmpty_hfig2")
 allow_search = false
 wraparound_items = false
-script = SubResource("GDScript_g4cmj")
+script = ExtResource("9_ojyn6")
 marker_top = NodePath("../MarkerTop")
 marker_bottom = NodePath("../MarkerBottom")
 
