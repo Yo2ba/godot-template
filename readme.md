@@ -258,27 +258,17 @@ An introspective in-game developer console mounted on `CanvasLayer`  **10**. It 
 
   
 
-| Method | Description |
-
-| :--- | :--- |
-
-| `Console.log(...args: Array) -> void` | Prints space-separated arguments to the console. If the **last argument** is a `Color`, it tints that specific log line. |
-
-| `Console.color(value: Color = Color.WHITE) -> void` | Sets the default fallback text color for subsequent `Console.log()` calls. |
-
-| `Console.toggle_console() -> void` | Manually toggles the visibility of the console UI. |
-
-| `Console.register_command(name: StringName, callback: Callable, description: String = "") -> void` | Registers a lowercase command. Automatically inspects the callable's argument count, default arguments, varargs, and expected parameter types. |
-
+| Method                                                                                                                           | Description                                                                                                                                     |
+|----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Console.log(...args: Array) -> void`                                                                                            | Prints space-separated arguments to the console. If the last argument is a Color, it tints that specific log line.                              |
+| `Console.color(value: Color = Color.WHITE) -> void`                                                                              | Sets the default fallback text color for subsequent `Console.log()` calls.                                                                      |
+| `Console.toggle_console() -> void`                                                                                               | Manually toggles the visibility of the console UI.                                                                                              |
+| `Console.register_command(name: StringName, callback: Callable, description: String = "") -> void`                               | Registers a lowercase command. Automatically inspects the callable's argument count, default arguments, varargs, and expected parameter types.  |
 | `Console.register_convar(name: StringName, property: StringName = &"", description: String = "", target: Object = null) -> void` | Binds a console variable to a script property. If `target` is omitted, automatically resolves the owning node via the call stack or scene tree. |
-
-| `Console.unregister(name: StringName) -> void` | Removes a command or ConVar from the registry. |
-
-| `Console.execute_command(name: StringName, raw_args: Array = []) -> void` | Parses string arguments into the callable's expected types and executes the command. |
-
-| `Console.get_convar_value(name: StringName) -> Variant` | Retrieves the current value of a registered ConVar. |
-
-| `Console.set_convar_value(name: StringName, value: Variant) -> void` | Updates the value of a registered ConVar with strict type checking. |
+| `Console.unregister(name: StringName) -> void`                                                                                   | Removes a command or ConVar from the registry.                                                                                                  |
+| `Console.execute_command(name: StringName, raw_args: Array = []) -> void`                                                        | Parses string arguments into the callable's expected types and executes the command.                                                            |
+| `Console.get_convar_value(name: StringName) -> Variant`                                                                          | Retrieves the current value of a registered ConVar.                                                                                             |
+| `Console.set_convar_value(name: StringName, value: Variant) -> void`                                                             | Updates the value of a registered ConVar with strict type checking.                                                                             |
 
   
 
@@ -372,17 +362,12 @@ While loading is active, the `LoadingScreen` automatically intercepts and blocks
 
   
 
-| Member | Type | Description |
-
-| :--- | :--- | :--- |
-
-| `scene_load_progress(progress: float)` | `signal` | Emitted continuously during loading (`0.0` to `1.0`). |
-
-| `scene_load_finished(success: bool)` | `signal` | Emitted when the background thread finishes loading the `PackedScene`. |
-
-| `load_scene(scene_path: String) -> void` | `method` | Shows the loading screen, blocks input, and begins loading `scene_path` via `ThreadedLoader`. |
-
-| `open_loaded_scene() -> void` | `method` | Switches the active scene tree to the preloaded scene and hides the loading screen after stabilization. |
+| Member                                   | Type     | Description                                                                                             |
+|------------------------------------------|----------|---------------------------------------------------------------------------------------------------------|
+| `scene_load_progress(progress: float)`   | `signal` | Emitted continuously during loading (0.0 to 1.0).                                                       |
+| `scene_load_finished(success: bool)`     | `signal` | Emitted when the background thread finishes loading the PackedScene.                                    |
+| `load_scene(scene_path: String) -> void` | `method` | Shows the loading screen, blocks input, and begins `loading scene_path` via `ThreadedLoader`.           |
+| `open_loaded_scene() -> void`            | `method` | Switches the active scene tree to the preloaded scene and hides the loading screen after stabilization. |
 
   
 
@@ -518,25 +503,16 @@ It also spawns the `DebugMenu` overlay on `CanvasLayer`  **1**, which calculates
 
   
 
-| GDScript Property | Console ConVar | Type | Default | Description |
-
-| :--- | :--- | :--- | :--- | :--- |
-
-| `Settings.fps_max` | `fps_max` | `int` | `0` | Caps engine FPS (`0` = unlimited, otherwise clamped to $\ge 64$). |
-
-| `Settings.showfps` | `showfps` | `bool` | `false` | Toggles the real-time Frame Time & Avg FPS counter overlay. |
-
-| `Settings.showtick` | `showtick` | `bool` | `false` | Toggles the real-time Physics Ticks/s overlay. |
-
-| `Settings.master_volume` | `volume` | `float` | `1.0` | Linear volume (`0.0` to `1.0`) for the `Master` audio bus. Auto-mutes at `0.0`. |
-
-| `Settings.music_volume` | `music` | `float` | `1.0` | Linear volume (`0.0` to `1.0`) for the `music` audio bus. Auto-mutes at `0.0`. |
-
-| `Settings.sfx_volume` | `sfx` | `float` | `1.0` | Linear volume (`0.0` to `1.0`) for the `sfx` audio bus. Auto-mutes at `0.0`. |
-
-| `Settings.console_position`| *(Internal)* | `Vector2`| Centered | Persists the developer console window position. |
-
-| `Settings.console_size` | *(Internal)* | `Vector2`| `800x600`| Persists the developer console window dimensions. |
+| GDScript Property           | Console ConVar | Type      | Default    | Description                                                                     |
+|-----------------------------|----------------|-----------|------------|---------------------------------------------------------------------------------|
+| `Settings.fps_max`          | `fps_max`      | `int`     | `0`        | Caps engine FPS (`0` = unlimited, otherwise clamped to ≥ 64).                   |
+| `Settings.show_fps`         | `showfps`      | `bool`    | `false`    | Toggles the real-time Frame Time & Avg FPS counter overlay.                     |
+| `Settings.showtick`         | `showtick`     | `bool`    | `false`    | Toggles the real-time Physics Ticks/s overlay.                                  |
+| `Settings.master_volume`    | `volume`       | `float`   | `1.0`      | Linear volume (`0.0` to `1.0`) for the `Master` audio bus. Auto-mutes at `0.0`. |
+| `Settings.music_volume`     | `music`        | `float`   | `1.0`      | Linear volume (`0.0` to `1.0`) for the `music` audio bus. Auto-mutes at `0.0`.  |
+| `Settings.sfx_volume`       | `sfx`          | `float`   | `1.0`      | Linear volume (`0.0` to `1.0`) for the `sfx` audio bus. Auto-mutes at `0.0`.    |
+| `Settings.console_position` | *(internal)*   | `Vector2` | *Centered* | Persists the developer console window position.                                 |
+| `Settings.console_size`     | *(internal)*   | `Vector2` | `800x600`  | Persists the developer console window dimensions.                               |
 
   
 
@@ -676,17 +652,12 @@ A fast, custom-header binary file serializer and deserializer for saving game st
 
   
 
-| Offset | Size | Type | Value / Description |
-
-| :--- | :--- | :--- | :--- |
-
-| `0` | $3\text{ B}$ | `PackedByteArray` | Magic Identifier: `[89, 79, 50]` (`"YO2"`) |
-
-| `3` | $4\text{ B}$ | `int32` | Format Version (`1`) |
-
-| `7` | $8\text{ B}$ | `int64` | Payload Size in bytes (Max $256\text{ MiB}$) |
-
-| `15` | $N\text{ B}$ | `PackedByteArray` | Encoded `Variant` Dictionary (`{"data": data}`) |
+| Offset | Size | Type              | Value/Description                               |
+|--------|------|-------------------|-------------------------------------------------|
+| `0`    | 3B   | `PackedByteArray` | Magic Identifier: `[89, 79, 50]` (`"YO2"`)      |
+| `3`    | 4B   | `int32`           | Format Version (`1`)                            |
+| `7`    | 8B   | `int64`           | Payload Size in bytes (Max 256 MiB)             |
+| `15`   | *N*B | `PackedByteArray` | Encoded `Variant` Dictionary (`{"data": data}`) |
 
   
 
