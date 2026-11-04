@@ -82,6 +82,7 @@ res://
 ├── utils/
 
 	│ ├── audio_bus.tres
+	│ └── languages.tres
 
 ├── icon.svg
 
