@@ -69,11 +69,11 @@ res://
 
 ├── 🔴 api/ <-- CORE FRAMEWORK (DO NOT MODIFY)
 
-    └ ├── 🔴 scripts/
+    └ └── 🔴 scripts/
     
           │ ├── 🔴 globals/...
 
-          │ └── 🔴 utils/...
+          └ └── 🔴 utils/...
 
 ├── example_folder1/
 
@@ -83,7 +83,7 @@ res://
 
 	│ ├── audio_bus.tres
 
-	│ └── languages.tres
+	└ └── languages.tres
 
 ├── icon.svg
 
