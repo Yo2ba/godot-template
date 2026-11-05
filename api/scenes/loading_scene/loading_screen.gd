@@ -9,9 +9,11 @@ func set_progress(progress: float) -> void:
 
 	progress_bar.value = percentage
 
+
 func _input(_event: InputEvent) -> void:
 	if blocks_input:
 		get_viewport().set_input_as_handled()
+
 
 func reset() -> void:
 	set_progress(0.0)

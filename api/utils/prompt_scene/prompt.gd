@@ -36,6 +36,7 @@ func _input(event: InputEvent) -> void:
 				KEY_ENTER, KEY_KP_ENTER:
 					confirm()
 
+
 func setup(
 	prompt_title: String,
 	prompt_message: String,
@@ -47,13 +48,16 @@ func setup(
 	confirm_btn.text = confirm_name
 	cancel_btn.text = cancel_name
 
+
 func confirm() -> void:
 	if callable.is_valid():
 		callable.call()
 	close()
 
+
 func cancel() -> void:
 	close()
+
 
 func close() -> void:
 	if is_paused:

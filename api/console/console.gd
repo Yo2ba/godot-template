@@ -35,22 +35,19 @@ static var _sorted_names: Array[StringName] = []
 static var _names_dirty: bool = false
 
 
-static func _static_init() -> void:
-	if Engine.is_editor_hint():
+static func initialize(parent: Node) -> void:
+	if is_instance_valid(console_menu):
 		return
-	_initialize_ui.call_deferred()
-
-
-static func _initialize_ui() -> void:
-	var tree: SceneTree = Engine.get_main_loop() as SceneTree
-	if tree == null:
-		return
-
+	
+	Settings.load_config()
+	
 	var console_layer := _ConsoleLayer.new()
 	console_layer.layer = 10
-	tree.root.add_child.call_deferred(console_layer)
 	console_menu = CONSOLE_SCENE.instantiate()
-	console_layer.add_child.call_deferred(console_menu)
+	console_layer.add_child(console_menu)
+	parent.add_child(console_layer)
+	
+	Console.log("[Framework] Console: Initialized", Color(0.0, 1.0, 1.0, 1.0))
 
 
 static func toggle_console() -> void:

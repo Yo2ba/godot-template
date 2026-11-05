@@ -22,6 +22,10 @@ config/icon="uid://64b60fys2mlh"
 
 buses/default_bus_layout="uid://chv7np8s2h3xb"
 
+[autoload]
+
+Framework="*uid://beto3lpshep34"
+
 [debug]
 
 file_logging/enable_file_logging.pc=false

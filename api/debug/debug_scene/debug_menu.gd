@@ -56,5 +56,6 @@ func _process(delta: float) -> void:
 		fps_timer = 0.0
 		max_frame_time = 0.0
 
+
 func _physics_process(_delta: float) -> void:
 	physics_frame_count += 1

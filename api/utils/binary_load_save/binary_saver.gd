@@ -1,9 +1,9 @@
 @abstract
 class_name BinarySaver
 
-const MAGIC: PackedByteArray = [89, 79, 50] # YO2
+const MAGIC: PackedByteArray = [89, 79, 50, 0] # YO2\0
 const FORMAT_VERSION: int = 1
-const HEADER_SIZE: int = 15
+const HEADER_SIZE: int = 16
 
 
 static func save_file(path: String, data: Variant) -> Error:

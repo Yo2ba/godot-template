@@ -95,8 +95,8 @@ static var console_size: Vector2 = Vector2(600.0, 400.0):
 			save_setting("console_size", console_size)
 
 
-static func _static_init() -> void:
-	if Engine.is_editor_hint():
+static func initialize(parent: Node) -> void:
+	if is_instance_valid(debug_menu):
 		return
 
 	_bus_master = AudioServer.get_bus_index("Master")
@@ -104,10 +104,7 @@ static func _static_init() -> void:
 	_bus_sfx = AudioServer.get_bus_index("sfx")
 
 	load_config()
-	_initialize.call_deferred()
 
-
-static func _initialize() -> void:
 	Console.register_convar(&"fps_max", &"fps_max", "Set FPS limit", Settings)
 	Console.register_convar(&"showfps", &"showfps", "Show frames rendering info", Settings)
 	Console.register_convar(&"showtick", &"showtick", "Show physics tick info", Settings)
@@ -115,15 +112,13 @@ static func _initialize() -> void:
 	Console.register_convar(&"music", &"music_volume", "Music volume", Settings)
 	Console.register_convar(&"sfx", &"sfx_volume", "Sfx volume", Settings)
 
-	var tree: SceneTree = Engine.get_main_loop() as SceneTree
-	if tree == null:
-		return
-
 	var debug_layer := _DebugLayer.new()
 	debug_layer.layer = 1
-	tree.root.add_child.call_deferred(debug_layer)
 	debug_menu = DEBUG_SCENE.instantiate()
-	debug_layer.add_child.call_deferred(debug_menu)
+	debug_layer.add_child(debug_menu)
+	parent.add_child(debug_layer)
+	
+	Console.log("[Framework] Settings: Initialized", Color(0.0, 1.0, 1.0, 1.0))
 
 
 static func _apply_bus_volume(bus_index: int, setting_key: String, volume: float) -> void:

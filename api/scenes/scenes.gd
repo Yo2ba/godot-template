@@ -24,32 +24,22 @@ static var loaded_scene: PackedScene
 static var is_loading: bool = false
 
 
-static func _static_init() -> void:
-	if Engine.is_editor_hint():
-		return
-	_initialize.call_deferred()
-
-
-static func _initialize() -> void:
+static func initialize(parent: Node) -> void:
 	if is_instance_valid(loading_screen):
-		return
-
-	var tree: SceneTree = Engine.get_main_loop() as SceneTree
-	if tree == null:
 		return
 
 	var loading_screen_scene: PackedScene = load(LOADING_SCREEN_PATH)
 	loading_screen = loading_screen_scene.instantiate() as CanvasLayer
 	loading_screen.layer = 9
-	tree.root.add_child.call_deferred(loading_screen)
 	loading_screen.hide()
+	parent.add_child(loading_screen)
+	
+	Console.log("[Framework] Scenes: Initialized", Color(0.0, 1.0, 1.0, 1.0))
 
 
 static func load_scene(scene_path: String) -> void:
 	if is_loading:
 		return
-
-	_initialize()
 
 	is_loading = true
 	loaded_scene = null
