@@ -13,6 +13,7 @@ func initialize_framework() -> void:
 	Console.initialize(self)
 	Settings.initialize(self)
 	Scenes.initialize(self)
+	HTTP.initialize(self)
 
 
 func _exit_tree() -> void:
