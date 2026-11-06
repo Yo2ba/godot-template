@@ -115,6 +115,13 @@ static func initialize(parent: Node) -> void:
 	var debug_layer := _DebugLayer.new()
 	debug_layer.layer = 1
 	debug_menu = DEBUG_SCENE.instantiate()
+	
+	debug_menu.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	debug_menu.focus_mode = Control.FOCUS_NONE
+	for node: Control in debug_menu.find_children("*", "Control", true, false):
+		node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		node.focus_mode = Control.FOCUS_NONE
+	
 	debug_layer.add_child(debug_menu)
 	parent.add_child(debug_layer)
 	
