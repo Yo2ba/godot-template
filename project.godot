@@ -24,12 +24,7 @@ buses/default_bus_layout="uid://chv7np8s2h3xb"
 
 [autoload]
 
-ThreadedLoader="*uid://bjvuayvaxw5a"
-Console="*uid://c8ekuc8h2hii4"
-Settings="*uid://bwnpkh85hvs6p"
-Scenes="*uid://b4s588ny4xgju"
-Utils="*uid://cndoo2or440yj"
-Flags="*uid://bgjgjux375vvi"
+Framework="*uid://beto3lpshep34"
 
 [debug]
 
