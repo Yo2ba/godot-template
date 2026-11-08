@@ -88,6 +88,7 @@ func item_clicked(index: int, _at_position: Vector2, mouse_button_index: int) ->
 
 func add_menu(at_position: Vector2) -> void:
 	context_menu = ItemList.new()
+	context_menu.clip_contents = false
 	context_menu.theme = CONTEXT_MENU_THEME
 	context_menu.auto_height = true
 	context_menu.allow_rmb_select = true
