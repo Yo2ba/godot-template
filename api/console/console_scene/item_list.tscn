@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://b7lr8ttrm4oac"]
+
+[node name="ItemList" type="ItemList" unique_id=1651126072]
+offset_right = 40.0
+offset_bottom = 40.0
+item_count = 2
+item_0/text = "wqeqe"
+item_1/text = "qqwew"

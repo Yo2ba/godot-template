@@ -1,0 +1,29 @@
+[gd_resource type="Theme" format=3 uid="uid://b57q4puu0y02w"]
+
+[ext_resource type="FontFile" uid="uid://d2xjr0junqunw" path="res://api/utils/prompt_scene/Stratum2-Regular-400.ttf" id="1_cp10d"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
+bg_color = Color(0.09803922, 0.11764706, 0.14509805, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_um5md"]
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0.14928284, 0.17545618, 0.21209882, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[resource]
+ItemList/colors/font_color = Color(0.79607844, 0.79607844, 0.79607844, 1)
+ItemList/colors/font_hovered_color = Color(0.79607844, 0.79607844, 0.79607844, 1)
+ItemList/colors/font_hovered_selected_color = Color(0.79607844, 0.79607844, 0.79607844, 1)
+ItemList/colors/font_selected_color = Color(0.79607844, 0.79607844, 0.79607844, 1)
+ItemList/colors/guide_color = Color(0.69803923, 0.69803923, 0.69803923, 0)
+ItemList/constants/h_separation = 28
+ItemList/constants/v_separation = 12
+ItemList/fonts/font = ExtResource("1_cp10d")
+ItemList/styles/hovered = SubResource("StyleBoxFlat_g4v7s")
+ItemList/styles/hovered_selected = SubResource("StyleBoxFlat_g4v7s")
+ItemList/styles/panel = SubResource("StyleBoxFlat_um5md")
+ItemList/styles/selected = SubResource("StyleBoxFlat_g4v7s")

@@ -4,6 +4,7 @@
 [ext_resource type="Theme" uid="uid://bln5anbi0dt0n" path="res://api/api_theme.tres" id="1_ev3qo"]
 [ext_resource type="FontFile" uid="uid://4wkebsccq512" path="res://api/console/console_scene/Stratum2-Bold-700.ttf" id="2_egmcf"]
 [ext_resource type="FontFile" uid="uid://ood63wr07bui" path="res://api/console/console_scene/Stratum2-Mono-Regular-400.ttf" id="2_tok2f"]
+[ext_resource type="Script" uid="uid://t0238qaemodt" path="res://api/console/console_scene/context_menu.gd" id="3_eiulc"]
 [ext_resource type="Texture2D" uid="uid://cdeoa2y05p1su" path="res://api/console/console_scene/cross_n.svg" id="4_g4cmj"]
 [ext_resource type="Texture2D" uid="uid://cddbfvbjjsbtt" path="res://api/console/console_scene/cross_p.svg" id="5_ew1rg"]
 [ext_resource type="Texture2D" uid="uid://bhnrl0cqanl5s" path="res://api/console/console_scene/arrow.svg" id="6_d5qkd"]
@@ -163,11 +164,13 @@ drag_and_drop_selection_enabled = false
 layout_mode = 2
 focus_mode = 1
 theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_selected_color = Color(0.79607844, 0.79607844, 0.79607844, 1)
 theme_override_colors/selection_color = Color(0.3254902, 0.3372549, 0.3764706, 1)
 theme_override_fonts/font = ExtResource("2_tok2f")
 theme_override_styles/normal = SubResource("StyleBoxFlat_ev3qo")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_egmcf")
 keep_editing_on_text_submit = true
+context_menu_enabled = false
 caret_blink = true
 caret_blink_interval = 0.5
 right_icon = ExtResource("6_d5qkd")
@@ -224,3 +227,12 @@ mouse_default_cursor_shape = 12
 texture_normal = ExtResource("7_rnlvh")
 texture_pressed = ExtResource("8_qv6wu")
 texture_hover = ExtResource("9_g4cmj")
+
+[node name="ContexMenu" type="Control" parent="Window" unique_id=611305910 node_paths=PackedStringArray("line", "output")]
+layout_mode = 2
+focus_behavior_recursive = 1
+mouse_filter = 2
+script = ExtResource("3_eiulc")
+line = NodePath("../VBoxContainer/BodySections/VBoxContainer/Line")
+output = NodePath("../VBoxContainer/BodySections/VBoxContainer/MarginContainer/Output")
+metadata/_edit_lock_ = true
