@@ -14,6 +14,8 @@ var darken: bool
 
 
 func _ready() -> void:
+	assert(get_tree().current_scene != self, "This scene cannot be used as an entry point.")
+	
 	layer = RenderingServer.CANVAS_LAYER_MAX - 1
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	

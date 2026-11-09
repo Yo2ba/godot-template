@@ -4,6 +4,9 @@ extends CanvasLayer
 
 var blocks_input: bool = false
 
+func _ready() -> void:
+	assert(get_tree().current_scene != self, "This scene cannot be used as an entry point.")
+
 func set_progress(progress: float) -> void:
 	var percentage: float = clampf(progress, 0.0, 1.0) * 100.0
 

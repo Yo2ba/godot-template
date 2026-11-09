@@ -12,6 +12,9 @@ var max_frame_time: float = 0.0
 var physics_frame_count: int = 0
 var physics_tps: int = 0
 
+func _ready() -> void:
+	assert(get_tree().current_scene != self, "This scene cannot be used as an entry point.")
+
 func _process(delta: float) -> void:
 	frame_count += 1
 	fps_timer += delta

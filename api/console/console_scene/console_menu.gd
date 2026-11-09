@@ -31,6 +31,8 @@ var hint_restore_text: String = ""
 
 
 func _ready() -> void:
+	assert(get_tree().current_scene != self, "This scene cannot be used as an entry point.")
+	
 	register_commands()
 	hide()
 	set_process_input(false)

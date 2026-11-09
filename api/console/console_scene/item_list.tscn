@@ -1,8 +1,17 @@
 [gd_scene format=3 uid="uid://b7lr8ttrm4oac"]
 
+[sub_resource type="GDScript" id="GDScript_5sb7d"]
+script/source = "extends ItemList
+
+
+func _ready() -> void:
+	assert(get_tree().current_scene != self, \"This scene cannot be used as an entry point.\")
+"
+
 [node name="ItemList" type="ItemList" unique_id=1651126072]
 offset_right = 40.0
 offset_bottom = 40.0
 item_count = 2
 item_0/text = "wqeqe"
 item_1/text = "qqwew"
+script = SubResource("GDScript_5sb7d")
