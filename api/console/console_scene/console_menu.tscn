@@ -10,9 +10,11 @@
 [ext_resource type="Texture2D" uid="uid://bhnrl0cqanl5s" path="res://api/console/console_scene/arrow.svg" id="6_d5qkd"]
 [ext_resource type="Texture2D" uid="uid://dmepg4r1kfmti" path="res://api/console/console_scene/cross_h.svg" id="6_rokao"]
 [ext_resource type="Texture2D" uid="uid://b1iuv0v8ix8m6" path="res://api/console/console_scene/handle_n.svg" id="7_rnlvh"]
+[ext_resource type="Script" uid="uid://dmy48q84r3wrt" path="res://api/console/console_scene/output.gd" id="8_eiulc"]
 [ext_resource type="Texture2D" uid="uid://bdf35gpf2reny" path="res://api/console/console_scene/handle_p.svg" id="8_qv6wu"]
 [ext_resource type="Texture2D" uid="uid://cslw1nmeorq1r" path="res://api/console/console_scene/handle_h.svg" id="9_g4cmj"]
 [ext_resource type="Script" uid="uid://ub0eilwlhevt" path="res://api/console/console_scene/hint_list.gd" id="9_ojyn6"]
+[ext_resource type="Script" uid="uid://c34aoogcb2blg" path="res://api/console/console_scene/line.gd" id="10_ifrei"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ohn4w"]
 bg_color = Color(0.13333334, 0.15686275, 0.19215687, 1)
@@ -158,7 +160,9 @@ bbcode_enabled = true
 scroll_following = true
 autowrap_mode = 0
 selection_enabled = true
+deselect_on_focus_loss_enabled = false
 drag_and_drop_selection_enabled = false
+script = ExtResource("8_eiulc")
 
 [node name="Line" type="LineEdit" parent="Window/VBoxContainer/BodySections/VBoxContainer" unique_id=1418277443]
 layout_mode = 2
@@ -171,9 +175,13 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_ev3qo")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_egmcf")
 keep_editing_on_text_submit = true
 context_menu_enabled = false
+emoji_menu_enabled = false
+middle_mouse_paste_enabled = false
+drag_and_drop_selection_enabled = false
 caret_blink = true
 caret_blink_interval = 0.5
 right_icon = ExtResource("6_d5qkd")
+script = ExtResource("10_ifrei")
 
 [node name="MarkerTop" type="Control" parent="Window/VBoxContainer/BodySections/VBoxContainer/Line" unique_id=1755612244]
 layout_mode = 1
