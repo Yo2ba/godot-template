@@ -14,9 +14,6 @@ var darken: bool
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	
-	if is_paused:
-		get_tree().paused = true
 		
 	if not darken:
 		color_rect.hide()
@@ -27,14 +24,10 @@ func _ready() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:
-		get_viewport().set_input_as_handled()
-
 		if event.pressed and not event.is_echo():
 			match event.keycode:
 				KEY_ESCAPE:
 					cancel()
-				KEY_ENTER, KEY_KP_ENTER:
-					confirm()
 
 
 func setup(

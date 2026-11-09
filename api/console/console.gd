@@ -42,7 +42,7 @@ static func initialize(parent: Node) -> void:
 	Settings.load_config()
 	
 	var console_layer := _ConsoleLayer.new()
-	console_layer.layer = 10
+	console_layer.layer = RenderingServer.CANVAS_LAYER_MAX
 	console_menu = CONSOLE_SCENE.instantiate()
 	console_layer.add_child(console_menu)
 	parent.add_child(console_layer)
